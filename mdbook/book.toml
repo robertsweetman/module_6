@@ -1,0 +1,16 @@
+[book]
+authors = ["robertsweetman"]
+language = "en"
+src = "src"
+title = "Cloud Computing and Scalable Architecture"
+
+[build]
+extra-watch-dirs = ["images"]
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+
+[output.html]
+additional-js = ["mermaid-init.js", "mermaid.min.js"]
+default-theme = "Rust"
+no-section-label = true
