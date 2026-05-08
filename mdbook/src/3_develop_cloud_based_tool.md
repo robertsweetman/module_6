@@ -1,4 +1,4 @@
-# Develop Cloud Based Tool <!-- 900 words -->
+# Develop Cloud Based Tool <!-- 1200 words -->
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===

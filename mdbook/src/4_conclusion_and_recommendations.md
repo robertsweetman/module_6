@@ -1,4 +1,4 @@
-# Conclusion and Recommendations <!-- 650 words -->
+# Conclusion and Recommendations <!-- 800 words -->
 
 TODO: Highlight how this sort of observability and visibility is going to become even more important as AI enables the INCREASE in deployment speed, change rate increases and so on <-- come up with a better way to describe this
 

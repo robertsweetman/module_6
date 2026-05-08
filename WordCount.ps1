@@ -1,10 +1,10 @@
 # Get Word Count from files without including multi-line comments inside <!-- -->
 
 $files = @(
-    [PSCustomObject]@{ Name = "1_introduction_and_overview.md"; Limit = 650 }
-    [PSCustomObject]@{ Name = "2_design_cloud_based_tool.md"; Limit = 900 }
-    [PSCustomObject]@{ Name = "3_develop_cloud_based_tool.md"; Limit = 900 }
-    [PSCustomObject]@{ Name = "4_conclusion_and_recommendations.md"; Limit = 650 }
+    [PSCustomObject]@{ Name = "1_introduction_and_overview.md"; Limit = 800 }
+    [PSCustomObject]@{ Name = "2_design_cloud_based_tool.md"; Limit = 1200 }
+    [PSCustomObject]@{ Name = "3_develop_cloud_based_tool.md"; Limit = 1200 }
+    [PSCustomObject]@{ Name = "4_conclusion_and_recommendations.md"; Limit = 800 }
 )
 
 $totalWordCount = 0

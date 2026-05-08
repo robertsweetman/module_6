@@ -1,4 +1,30 @@
-# Design Cloud Based Tool <!-- 900 words -->
+# Design Cloud Based Tool <!-- 1200 words -->
+
+## Requirements Gathering
+
+### Functional Requirements
+
+REF: Inline quote - what are functional requirements
+
+INTERPRET THESE
+
+### Non-Functional Requirements
+
+REF: Inline quote - what are non-functional requirements
+
+INTERPRET THESE
+
+### Security Requirements
+
+IMPLEMENT THESE
+
+DDA & CAB process?? Ugh...
+
+## Solution Design
+
+- Explain considerations
+- How the design could flex versus priorities IMPORTANT: Describe different adaption strategies - how would you evaluate these different adoption strategies when it comes to responding to change
+
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
