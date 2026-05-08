@@ -1,4 +1,12 @@
 book
+prompt.txt
 .DS_Store
 
 pdf-reader/target
+
+# GitIgnore for Rust projects
+**/target/*
+**/*.rs.bkp
+
+# Personalized settings
+copilot-instructions.md
