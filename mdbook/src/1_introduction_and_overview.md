@@ -12,25 +12,25 @@ The move from multi-week on-prem deployments to a service model can be summed up
 
 Infrastructure automation tools like Terraform, Bicep (Azure), Cloudfront (AWS) enable the flexibility to stand services up, turn them off and then rebuild them at the touch of a button.
 
-## Move Fast and Break Things
+## Move Fast and (Don't) Break Things
 
-A phrase made famous by Mark Zuckerberg, the era of "Move Fast and Break Things" is over both technically and culturally (Taneja, 2019). End user demand and expectation of a reliable, consistent online experience is now absolute based on over twenty years of people's interactions with the internet (REF:)
+Mark Zuckerberg announced in 2014 that Meta's internal motto would change from "Move fast and break things" to "Move fast with stable infrastructure" (Wikipedia, 2023). The era of "Move Fast and Break Things" is over both technically and culturally (Taneja, 2019). End user demand and expectation of a reliable, consistent online experience is now absolute following people's interactions with the internet over the last 20+ years (John, 2026)
 
-Empowering dozens of engineering teams to make daily changes across different levels of their application stack requires automation to support test environemts, deployment pipelins and visibility of changes over time.
+Empowering dozens of engineering teams to make daily changes across different applications and repositories requires automation to support test environments, deployment pipelines and visibility of changes over time.
 
-Having an at-a-glance way to see what's been deployed when and where allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up process of modern software development (REF: CI/CD what it means and why it's an indicator of a successfull or high performing team)
+Having an at-a-glance way to see what's been deployed when and where allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up process of modern software development. TODO: (REF: CI/CD what it means and why it's an indicator of a successfull or high performing team)
 
 ## Batteries Included via IaC automation
 
-This automation - infrastructure as code (IaC) - is now the enabling layer to having a robust, scalable, monitorable and disaster resistant solution (REF: benefits of IaC)
+This automation - infrastructure as code (IaC) - is now the enabling layer to having a robust, scalable, monitorable and disaster resistant solution (about.gitlab.com, 2026)
 
 It defines everything from hub/spoke networking, firewalls, traffic to/from the environment, secure access, monitoring, security, alerts, user groups and roles defining who can do what inside a particular cloud.
 
-## The world view problem
+## What's going on?
 
-With all this agile, fast moving software development happening it's challenging for various stake-holders to understand where a particular program or service has reached in its development cycle.
+With all this fast moving software development happening it's challenging for various stake holders to understand where a particular program or service has reached in its deployment cycle.
 
-Stakeholders have their own particular view and context:
+Each stakeholder group has their own particular view and context:
 
 Developers & Testers
  - What application versions are deployed?
@@ -56,7 +56,11 @@ While Azure DevOps provides an individual 'per-project' view there's no single p
 
 (REF: developing in silos, business management, expectation management) 
 
-## 
+## Solution Overview
+
+A cloud-based delivery visibility site provides a single, organisation-wide view of application and infrastructure status, connecting code changes to deployment outcomes across environments.
+
+It aligns with the software development lifecycle by supporting planning, build, test, release, and live monitoring. 
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
