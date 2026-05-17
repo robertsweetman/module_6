@@ -3,6 +3,7 @@ prompt.txt
 .DS_Store
 
 pdf-reader/target
+AGENTS.md
 
 # GitIgnore for Rust projects
 **/target/*
