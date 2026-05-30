@@ -35,7 +35,9 @@ Is scalability an issue? Azure functions/function apps are inherantly scalable.
 
 ## Resilience and recovery from failure
 
-TODO: come up with a better title for this section. 
+Since we've gone with an Infrastructure as Code (IaC) approach the greatest benefit this holds is that, if the host environment suffer a catastrophic failure, it can be rebuilt simply be re-running the deployment pipeline.
+
+TODO: Other IaC advantages
 
 ## Alternative architectures
 
