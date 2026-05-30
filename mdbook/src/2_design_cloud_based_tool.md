@@ -37,8 +37,9 @@ While the URL _could_ exist publically there should be absolutely no access with
 
 ## Solution Design
 
-TODO: Explain what a function app is
-TODO: Add references (Microsoft docs)
+An Azure Function App is a managed hosting container that runs one or more small, event-triggered code units called Functions. The App Service platform handles the underlying compute, OS patching, TLS termination, and scaling, so the team writes only application logic (Microsoft, 2026). Functions are billed either per-execution on a Consumption plan, or at a fixed rate on a dedicated App Service Plan where the runtime stays resident on reserved virtual machine instances.
+
+In this implementation a **Basic B1 App Service Plan** (dedicated compute, Linux, ~£10/month) hosts a single Python 3.11 Function App with `always_on = true`. The dedicated plan was chosen over the Consumption (Y1) plan because personal Azure subscriptions carry a zero-core VM quota that blocks Consumption plan deployments; the B1 plan uses a pre-allocated instance that is not subject to that quota. On a dedicated plan the Functions runtime would idle after a few minutes of inactivity without `always_on`, causing the first request after a quiet period to incur a cold-start delay that would violate the 2-second page-load non-functional requirement (Microsoft, 2025). Always On prevents this by keeping the worker process live.
 
 The design uses an event-driven Azure architecture so pipeline outcomes are captured in near real time and exposed through a secure, lightweight dashboard API.
 
@@ -91,7 +92,7 @@ The networking design must balance UK residency, secure access, and low-latency 
 - UK data boundary: Place queue, functions, storage, and telemetry in UK regions to meet residency requirements.
 - Secure ingress: Enforce Entra sign-in, MFA, and UK-only Conditional Access before Function App access is granted.
   - Conditional Access rules could also be extended to device level if necessary
-- Private service paths: Use private endpoints and VNet integration for storage/telemetry to minimise public exposure. TODO: Read up more about this
+- Private service paths: Azure Private Endpoints assign a private IP address inside a Virtual Network to a managed service such as Azure Storage or Key Vault. Traffic between the Function App and those services then travels over the Azure backbone rather than the public internet, eliminating a class of network-level attack surface (Microsoft, 2024). VNet Integration allows the Function App's outbound calls to originate from a delegated subnet, which in turn enables network security group rules and private DNS zones to govern all egress. In this design the Function App, Storage Account, and Key Vault are candidates for private endpoint attachment once a supporting VNet is provisioned.
 - Controlled egress: Restrict outbound calls to approved Azure DevOps and Azure platform endpoints.
   - This site is 'read only' so in fact no outbound calls should be possible.
 - Performance and resilience: Keep ingestion and storage co-located and use retry/dead-letter plus geo-redundant storage where recovery objectives require it.

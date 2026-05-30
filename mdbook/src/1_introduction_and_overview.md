@@ -2,11 +2,11 @@
 
 ## Cloud Computing and Modern Software Development
 
-Moderns software development methodologies like Agile, Scrum etc. have relied heavily on the shift towards on demand based cloud based computing (LEAD INNOVATIONZ, 2025).
+Moderns software development methodologies like Agile, Scrum etc. have relied heavily on the shift towards **on demand** based cloud based computing (Lead Innovationz, 2025).
 
 These approaches leverage automation using CI/CD pipelines to enable rapid prototyping, innovation at scale and offer a commercial flexibility lacking in purely on-prem deployments (Surya S, 2023). 
 
-Containerisation and Serverless are the epitome of this approach where application running costs can be directly linked to business revenue and even API requests in the case of serverless. (REF:)
+Containerisation and Serverless are the epitome of this approach where application running costs can be directly linked to business revenue and even per API requests in the case of serverless. (azure.microsoft.com, June 2026)
 
 The move from multi-week on-prem deployments to a service model can be summed up in the phrase "cattle, not pets" as described by the DevOps movement (Hava, 2020). Resources become ephemeral and disposable.
 
@@ -16,9 +16,9 @@ Infrastructure automation tools like Terraform, Bicep (Azure), Cloudfront (AWS) 
 
 Mark Zuckerberg announced in 2014 that Meta's internal motto would change from "Move fast and break things" to "Move fast with stable infrastructure" (Wikipedia, 2023). The era of "Move Fast and Break Things" is over both technically and culturally (Taneja, 2019). End user demand and expectation of a reliable, consistent online experience is now absolute following people's interactions with the internet over the last 20+ years (John, 2026)
 
-Empowering dozens of engineering teams to make daily changes across different applications and repositories requires automation to support test environments, deployment pipelines and visibility of changes over time.
+Empowering dozens of engineering teams to make daily changes across different applications and repositories requires automation to build test environments, deployment pipelines and visibility of changes over time.
 
-Having an at-a-glance way to see what's been deployed when and where allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up process of modern software development. TODO: (REF: CI/CD what it means and why it's an indicator of a successfull or high performing team)
+Having an at-a-glance way to see what's been deployed when and where allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up the process of modern software development. Leveraging CI/CD confers a dozen distinct advantages over organisations that don't use this development pattern.  (JetBrains, 2026)
 
 ## Batteries Included via IaC automation
 
@@ -52,7 +52,7 @@ Business Owners
  - Where in the feature delivery pipeline is a particula application?
   - Development/Testing/Live
 
-While Azure DevOps provides an individual 'per-project' view there's no single place where this sort of information can be surfaced across an organisation
+While Azure DevOps provides an individual 'per-project' view there's no single place where this sort of information can be surfaced across an organisation.
 
 (REF: developing in silos, business management, expectation management) 
 
@@ -60,7 +60,13 @@ While Azure DevOps provides an individual 'per-project' view there's no single p
 
 A cloud-based delivery visibility site provides a single, organisation-wide view of application and infrastructure status, connecting code changes to deployment outcomes across environments.
 
-It aligns with the software development lifecycle by supporting planning, build, test, release, and live monitoring. 
+It aligns with the software development lifecycle by supporting planning, build, test, release, and live monitoring.
+
+![Resource map](images/resource_map.png)
+
+
+
+
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
