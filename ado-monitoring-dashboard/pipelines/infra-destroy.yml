@@ -1,0 +1,128 @@
+# ============================================================================
+# ADO Monitoring Dashboard — Terraform Destroy Pipeline
+# ============================================================================
+# PERMANENTLY DESTROYS all infra/ resources.
+# Gated by manual approval on the ado-dashboard-destroy ADO Environment.
+# trigger: none — must be run manually only.
+# ============================================================================
+
+trigger: none
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: ado-dashboard-secrets   # contains: subscriptionId (secret)
+  - name: workingDirectory
+    value: 'infra'
+  - name: serviceConnection
+    value: 'id-ado-dashboard-terraform'
+  - name: ARM_USE_OIDC
+    value: 'true'
+  - name: terraformVersion
+    value: '1.13.0'
+  - name: projectName
+    value: 'ado-dashboard'
+  - name: environment
+    value: 'dev'
+
+stages:
+  # ============================================================================
+  # Plan Destroy — show what will be destroyed before approval
+  # ============================================================================
+  - stage: PlanDestroy
+    displayName: 'Plan Destroy'
+    jobs:
+      - job: TerraformPlanDestroy
+        displayName: 'terraform plan -destroy'
+        steps:
+          - checkout: self
+
+          - script: |
+              TF_VERSION="$(terraformVersion)"
+              wget -q "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+              unzip -q "terraform_${TF_VERSION}_linux_amd64.zip"
+              sudo mv terraform /usr/local/bin/
+              terraform version
+            displayName: 'Install Terraform $(terraformVersion)'
+
+          - task: AzureCLI@2
+            displayName: 'terraform init + plan -destroy'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
+              inlineScript: |
+                export ARM_CLIENT_ID="$servicePrincipalId"
+                export ARM_TENANT_ID="$tenantId"
+                export ARM_SUBSCRIPTION_ID="$(subscriptionId)"
+                export ARM_USE_OIDC=true
+                export ARM_OIDC_TOKEN="$idToken"
+
+                cd $(workingDirectory)
+
+                terraform init \
+                  -backend-config="subscription_id=$(subscriptionId)"
+
+                terraform plan \
+                  -destroy \
+                  -var="subscription_id=$(subscriptionId)" \
+                  -var="tenant_id=$ARM_TENANT_ID" \
+                  -input=false
+
+  # ============================================================================
+  # Destroy — gated by manual approval, then applies the destroy plan
+  # ============================================================================
+  - stage: Destroy
+    displayName: 'Destroy Infrastructure'
+    dependsOn: PlanDestroy
+    condition: succeeded('PlanDestroy')
+    jobs:
+      - deployment: TerraformDestroy
+        displayName: 'terraform destroy'
+        environment: 'ado-dashboard-destroy'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - script: |
+                    TF_VERSION="$(terraformVersion)"
+                    wget -q "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+                    unzip -q "terraform_${TF_VERSION}_linux_amd64.zip"
+                    sudo mv terraform /usr/local/bin/
+                    terraform version
+                  displayName: 'Install Terraform $(terraformVersion)'
+
+                - task: AzureCLI@2
+                  displayName: 'terraform init + destroy'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      export ARM_CLIENT_ID="$servicePrincipalId"
+                      export ARM_TENANT_ID="$tenantId"
+                      export ARM_SUBSCRIPTION_ID="$(subscriptionId)"
+                      export ARM_USE_OIDC=true
+                      export ARM_OIDC_TOKEN="$idToken"
+
+                      cd $(workingDirectory)
+
+                      terraform init \
+                        -backend-config="subscription_id=$(subscriptionId)"
+
+                      terraform destroy \
+                        -var="subscription_id=$(subscriptionId)" \
+                        -var="tenant_id=$ARM_TENANT_ID" \
+                        -auto-approve \
+                        -input=false
+
+                      echo ""
+                      echo "================================================"
+                      echo "Infrastructure destroy complete."
+                      echo "================================================"

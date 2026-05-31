@@ -1,0 +1,287 @@
+# ============================================================================
+# ADO Monitoring Dashboard — Terraform Deploy Pipeline
+# ============================================================================
+# Deploys infra/ to the personal Azure subscription using the UAMI service
+# connection created by bootstrap/.
+#
+# STAGES:
+#   Plan   — terraform init + plan (informational review)
+#   Apply  — fresh plan + apply, gated by manual approval via ADO Environment,
+#            then notifies the dashboard that the infra deploy succeeded
+#
+# AUTHENTICATION:
+#   Uses Workload Identity Federation (OIDC) — no stored secrets.
+#   Service connection: id-smi-adodashboard-terraform
+# ============================================================================
+
+trigger: none
+  # Uncomment when infra/ has content and you want automatic runs:
+  # branches:
+  #   include:
+  #     - main
+  # paths:
+  #   include:
+  #     - infra/**
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: ado-dashboard-secrets   # contains: subscriptionId (secret)
+  - name: workingDirectory
+    value: 'infra'
+  - name: serviceConnection
+    value: 'id-ado-dashboard-terraform'
+  - name: ARM_USE_OIDC
+    value: 'true'
+  - name: terraformVersion
+    value: '1.13.0'
+  # Logical names used to discover resources in Azure (must match infra/ Terraform defaults)
+  - name: projectName
+    value: 'ado-dashboard'
+  - name: environment
+    value: 'dev'
+
+stages:
+  # ============================================================================
+  # Plan Stage — generate and display the Terraform plan
+  # ============================================================================
+  - stage: Plan
+    displayName: 'Terraform Plan'
+    jobs:
+      - job: TerraformPlan
+        displayName: 'Run Terraform Plan'
+        steps:
+          - checkout: self
+
+          - script: |
+              TF_VERSION="$(terraformVersion)"
+              wget -q "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+              unzip -q "terraform_${TF_VERSION}_linux_amd64.zip"
+              sudo mv terraform /usr/local/bin/
+              terraform version
+            displayName: 'Install Terraform $(terraformVersion)'
+
+          - task: AzureCLI@2
+            displayName: 'Ensure backend container exists'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              addSpnToEnvironment: true
+              inlineScript: |
+                az account set --subscription "$(subscriptionId)"
+                az storage container create \
+                  --name "ado-dashboard-infra-tfstate" \
+                  --account-name "saadodashboardz238iouv" \
+                  --auth-mode login \
+                  --output none \
+                  && echo "Container ready."
+
+          - task: AzureCLI@2
+            displayName: 'Terraform Init'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              workingDirectory: $(workingDirectory)
+              addSpnToEnvironment: true
+              inlineScript: |
+                az account set --subscription "$(subscriptionId)"
+                export ARM_SUBSCRIPTION_ID="$(subscriptionId)"
+                az account show --query "{Name:name, ID:id}" -o table
+                echo ""
+                echo "Initializing Terraform..."
+                terraform init
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+          - task: AzureCLI@2
+            displayName: 'Terraform Plan'
+            inputs:
+              azureSubscription: $(serviceConnection)
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              workingDirectory: $(workingDirectory)
+              addSpnToEnvironment: true
+              inlineScript: |
+                az account set --subscription "$(subscriptionId)"
+                export ARM_SUBSCRIPTION_ID="$(subscriptionId)"
+
+                echo "State status:"
+                terraform state pull 2>/dev/null \
+                  | python3 -c "import sys,json; s=json.load(sys.stdin); print(f'Terraform {s[\"terraform_version\"]} | serial {s[\"serial\"]}')" \
+                  || echo "No existing state or state is empty"
+                echo ""
+
+                echo "Running terraform plan..."
+                terraform plan -out=tfplan
+
+                echo ""
+                echo "============================================"
+                echo "PLAN COMPLETE — review the output above"
+                echo "before approving the Apply stage."
+                echo "============================================"
+
+  # ============================================================================
+  # Apply Stage — manual approval via ADO Environment, then fresh plan + apply
+  # ============================================================================
+  - stage: Apply
+    displayName: 'Terraform Apply (Approval Required)'
+    dependsOn: Plan
+    condition: and(succeeded('Plan'), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - deployment: TerraformApply
+        displayName: 'Apply to subscription'
+        # Create an ADO Environment called 'ado-dashboard-infra' and configure
+        # an Approvals & Checks gate on it to require manual sign-off.
+        environment: 'ado-dashboard-infra'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - script: |
+                    TF_VERSION="$(terraformVersion)"
+                    wget -q "https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip"
+                    unzip -q "terraform_${TF_VERSION}_linux_amd64.zip"
+                    sudo mv terraform /usr/local/bin/
+                    terraform version
+                  displayName: 'Install Terraform $(terraformVersion)'
+
+                - task: AzureCLI@2
+                  displayName: 'Ensure backend container exists'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      az storage container create \
+                        --name "ado-dashboard-infra-tfstate" \
+                        --account-name "saadodashboardz238iouv" \
+                        --auth-mode login \
+                        --output none \
+                        && echo "Container ready."
+
+                - task: AzureCLI@2
+                  displayName: 'Terraform Init'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    workingDirectory: $(workingDirectory)
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      export ARM_SUBSCRIPTION_ID="$(subscriptionId)"
+                      az account show --query "{Name:name, ID:id}" -o table
+                      echo ""
+                      echo "Initializing Terraform..."
+                      terraform init
+                  env:
+                    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+                - task: AzureCLI@2
+                  displayName: 'Terraform Plan (fresh — drift detection)'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    workingDirectory: $(workingDirectory)
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      export ARM_SUBSCRIPTION_ID="$(subscriptionId)"
+
+                      echo "Running fresh plan to detect any drift since Plan stage..."
+                      terraform plan -out=tfplan
+
+                      echo ""
+                      echo "============================================"
+                      echo "FRESH PLAN READY — apply will proceed."
+                      echo "============================================"
+
+                - task: AzureCLI@2
+                  displayName: 'Terraform Apply'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    workingDirectory: $(workingDirectory)
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      export ARM_SUBSCRIPTION_ID="$(subscriptionId)"
+
+                      echo "Applying Terraform plan..."
+                      terraform apply -auto-approve tfplan
+
+                - task: AzureCLI@2
+                  displayName: 'Notify dashboard (infra deploy succeeded)'
+                  continueOnError: true
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      RG="rg-$(projectName)-$(environment)"
+
+                      HOSTNAME=$(az functionapp list \
+                        --resource-group "$RG" \
+                        --query "[0].defaultHostName" \
+                        --output tsv)
+
+                      KV_NAME=$(az keyvault list \
+                        --resource-group "$RG" \
+                        --query "[0].name" \
+                        --output tsv)
+
+                      API_KEY=$(az keyvault secret show \
+                        --vault-name "$KV_NAME" \
+                        --name "dashboard-ingest-api-key" \
+                        --query "value" \
+                        --output tsv)
+
+                      FINISH_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+                      PAYLOAD=$(jq -n \
+                        --arg pipelineName "$(Build.DefinitionName)" \
+                        --arg buildId      "$(Build.BuildId)" \
+                        --arg buildNumber  "$(Build.BuildNumber)" \
+                        --arg branch       "$(Build.SourceBranch)" \
+                        --arg triggeredBy  "$(Build.RequestedFor)" \
+                        --arg projectName  "$(System.TeamProject)" \
+                        --arg repoName     "$(Build.Repository.Name)" \
+                        --arg environment  "$(environment)" \
+                        --arg finishTime   "$FINISH_TIME" \
+                        '{
+                          pipelineName:    $pipelineName,
+                          buildId:         $buildId,
+                          buildNumber:     $buildNumber,
+                          status:          "Succeeded",
+                          branch:          $branch,
+                          triggeredBy:     $triggeredBy,
+                          projectName:     $projectName,
+                          repositoryName:  $repoName,
+                          environment:     $environment,
+                          startTime:       $finishTime,
+                          finishTime:      $finishTime,
+                          durationSeconds: 0
+                        }')
+
+                      HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                        -X POST \
+                        -H "Content-Type: application/json" \
+                        -H "x-api-key: $API_KEY" \
+                        -d "$PAYLOAD" \
+                        "https://${HOSTNAME}/events")
+
+                      echo "Dashboard notification: HTTP $HTTP_CODE"
+                      [ "$HTTP_CODE" = "204" ] || echo "::warning::Dashboard notification returned HTTP $HTTP_CODE"

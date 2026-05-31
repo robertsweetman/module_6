@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ADO Pipeline Dashboard</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+      --success: #3fb950;
+      --danger: #f85149;
+      --warning: #d29922;
+      --info: #58a6ff;
+      --accent: #1f6feb;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────────────────── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header h1 {
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    header h1 span { color: var(--info); }
+
+    #user-info {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    #sign-out {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color .15s;
+    }
+    #sign-out:hover { border-color: var(--text-muted); color: var(--text); }
+
+    /* ── Main ─────────────────────────────────────────────────────────── */
+    main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── Stats row ────────────────────────────────────────────────────── */
+    #stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .stat-card .label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+    .stat-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+
+    /* ── Table ────────────────────────────────────────────────────────── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-header h2 { font-size: 14px; font-weight: 600; }
+
+    #refresh-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    #refresh-btn:hover { border-color: var(--info); color: var(--info); }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface-2); }
+
+    /* ── Status badge ─────────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+    .badge::before { content: "●"; }
+    .badge-succeeded { background: #1c3d26; color: var(--success); }
+    .badge-failed    { background: #3d1c1c; color: var(--danger); }
+    .badge-canceled  { background: #3d3520; color: var(--warning); }
+    .badge-running   { background: #1c2a3d; color: var(--info); }
+    .badge-unknown   { background: var(--surface-2); color: var(--text-muted); }
+
+    /* ── Branch chip ──────────────────────────────────────────────────── */
+    .branch {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 11px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 4px;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* ── Filter bar ──────────────────────────────────────────────────── */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .filter-bar label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-right: 2px;
+    }
+
+    .filter-bar select {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 28px 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b949e'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+    }
+
+    .filter-bar select:focus { outline: none; border-color: var(--info); }
+
+    #filter-count {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ── Loading / empty states ───────────────────────────────────────── */
+    .state-row td {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 40px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--info);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Responsive ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hide-mobile { display: none; }
+      main { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ADO <span>Pipeline</span> Dashboard</h1>
+    <span id="user-info"></span>
+    <a id="sign-out" href="/.auth/logout">Sign out</a>
+  </header>
+
+  <main>
+    <div id="stats">
+      <div class="stat-card"><div class="label">Total runs</div><div class="value" id="stat-total">—</div></div>
+      <div class="stat-card"><div class="label">Succeeded</div><div class="value" id="stat-ok" style="color:var(--success)">—</div></div>
+      <div class="stat-card"><div class="label">Failed</div><div class="value" id="stat-fail" style="color:var(--danger)">—</div></div>
+      <div class="stat-card"><div class="label">Rollbacks</div><div class="value" id="stat-rollback" style="color:var(--warning)">—</div></div>
+      <div class="stat-card"><div class="label">Test pass rate</div><div class="value" id="stat-tests">—</div></div>
+      <div class="stat-card"><div class="label">Avg duration</div><div class="value" id="stat-dur">—</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <h2>Recent pipeline runs</h2>
+        <button id="refresh-btn" onclick="loadEvents()">↻ Refresh</button>
+      </div>
+      <div class="filter-bar">
+        <label for="filter-service">Service</label>
+        <select id="filter-service" onchange="applyFilters()">
+          <option value="">All</option>
+        </select>
+        <label for="filter-env">Environment</label>
+        <select id="filter-env" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="dev">dev</option>
+          <option value="test">test</option>
+          <option value="prod">prod</option>
+        </select>
+        <label for="filter-status">Status</label>
+        <select id="filter-status" onchange="applyFilters()">
+          <option value="">All</option>
+          <option value="succeeded">Succeeded</option>
+          <option value="failed">Failed</option>
+          <option value="canceled">Canceled</option>
+        </select>
+        <span id="filter-count"></span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Pipeline</th>
+            <th class="hide-mobile">Service</th>
+            <th class="hide-mobile">Version</th>
+            <th>Build #</th>
+            <th>Branch</th>
+            <th class="hide-mobile">Environment</th>
+            <th class="hide-mobile">Triggered by</th>
+            <th class="hide-mobile">Tests</th>
+            <th>Duration</th>
+            <th>Finished</th>
+          </tr>
+        </thead>
+        <tbody id="events-body">
+          <tr class="state-row"><td colspan="11"><span class="spinner"></span>Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    // ── Identity ──────────────────────────────────────────────────────────
+    fetch("/.auth/me")
+      .then(r => r.json())
+      .then(data => {
+        const u = (data && data[0]) || {};
+        const name = (u.user_claims || []).find(c =>
+          c.typ === "preferred_username" || c.typ === "name"
+        );
+        if (name) document.getElementById("user-info").textContent = name.val;
+      })
+      .catch(() => {});
+
+    // ── Helpers ───────────────────────────────────────────────────────────
+    function statusBadge(status) {
+      const s = (status || "").toLowerCase();
+      const cls =
+        s === "succeeded" ? "badge-succeeded" :
+        s === "failed"    ? "badge-failed"    :
+        s === "canceled"  ? "badge-canceled"  :
+        s === "running"   ? "badge-running"   : "badge-unknown";
+      return `<span class="badge ${cls}">${status || "Unknown"}</span>`;
+    }
+
+    function fmtDuration(secs) {
+      if (!secs) return "—";
+      const m = Math.floor(secs / 60), s = secs % 60;
+      return m ? `${m}m ${s}s` : `${s}s`;
+    }
+
+    function fmtDate(iso) {
+      if (!iso) return "—";
+      try {
+        return new Date(iso).toLocaleString(undefined, {
+          day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit"
+        });
+      } catch { return iso; }
+    }
+
+    function shortBranch(branch) {
+      return (branch || "").replace(/^refs\/heads\//, "");
+    }
+
+    // ── All events cache (populated once per loadEvents call) ────────────
+    let _allEvents = [];
+
+    // ── Render a subset of events into the table ──────────────────────────
+    function renderRows(events) {
+      const tbody = document.getElementById("events-body");
+
+      if (!events.length) {
+        tbody.innerHTML = '<tr class="state-row"><td colspan="11">No matching pipeline runs.</td></tr>';
+        document.getElementById("filter-count").textContent = "0 results";
+        return;
+      }
+
+      document.getElementById("filter-count").textContent =
+        events.length === _allEvents.length ? "" : `${events.length} of ${_allEvents.length}`;
+
+      tbody.innerHTML = events.map(e => {
+        const rollbackTag = e.isRollback
+          ? ` <span class="badge badge-canceled" title="Rollback">↩ rollback</span>` : "";
+        const failDetail = (e.failureReason || e.failedStage)
+          ? ` <span title="${escHtml(e.failureReason || "")}" style="color:var(--text-muted);font-size:11px">[${escHtml(e.failedStage || "failed")}]</span>` : "";
+        const testCell = (e.testsPassed || e.testsFailed)
+          ? `<span style="color:var(--success)">${e.testsPassed}✓</span> <span style="color:var(--danger)">${e.testsFailed}✗</span>` : "—";
+        const prLink = e.pullRequestId
+          ? `<a href="#" style="color:var(--info);text-decoration:none" title="PR #${escHtml(e.pullRequestId)}">PR#${escHtml(e.pullRequestId)}</a>` : "";
+        const commitHint = e.commitId
+          ? ` <span style="color:var(--text-muted);font-size:11px" title="${escHtml(e.commitId)}">${escHtml(e.commitId.slice(0,7))}</span>` : "";
+        return `
+        <tr>
+          <td>${statusBadge(e.status)}${rollbackTag}</td>
+          <td>${escHtml(e.pipelineName)}${failDetail}</td>
+          <td class="hide-mobile">${escHtml(e.serviceName || "—")}</td>
+          <td class="hide-mobile">${escHtml(e.releaseVersion || "—")}${commitHint}${prLink ? " " + prLink : ""}</td>
+          <td>${escHtml(e.buildNumber)}</td>
+          <td><span class="branch" title="${escHtml(e.branch)}">${escHtml(shortBranch(e.branch))}</span></td>
+          <td class="hide-mobile">${escHtml(e.environment || "—")}</td>
+          <td class="hide-mobile">${escHtml(e.triggeredBy || "—")}</td>
+          <td class="hide-mobile">${testCell}</td>
+          <td>${fmtDuration(e.durationSeconds)}</td>
+          <td>${fmtDate(e.finishTime || e.receivedAt)}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    // ── Apply current filter selections to the cached event list ──────────
+    function applyFilters() {
+      const svc    = document.getElementById("filter-service").value.toLowerCase();
+      const env    = document.getElementById("filter-env").value.toLowerCase();
+      const status = document.getElementById("filter-status").value.toLowerCase();
+
+      const filtered = _allEvents.filter(e =>
+        (!svc    || (e.serviceName  || "").toLowerCase() === svc) &&
+        (!env    || (e.environment  || "").toLowerCase() === env) &&
+        (!status || (e.status       || "").toLowerCase() === status)
+      );
+      renderRows(filtered);
+    }
+
+    // ── Populate the service dropdown from live data ───────────────────────
+    function populateServiceFilter(events) {
+      const sel = document.getElementById("filter-service");
+      const current = sel.value;
+      // Keep the "All" option, replace the rest
+      while (sel.options.length > 1) sel.remove(1);
+      const services = [...new Set(
+        events.map(e => e.serviceName).filter(Boolean)
+      )].sort();
+      services.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s;
+        opt.textContent = s;
+        sel.add(opt);
+      });
+      // Restore previous selection if still valid
+      if ([...sel.options].some(o => o.value === current)) sel.value = current;
+    }
+
+    // ── Load events ───────────────────────────────────────────────────────
+    function loadEvents() {
+      const tbody = document.getElementById("events-body");
+      tbody.innerHTML = '<tr class="state-row"><td colspan="11"><span class="spinner"></span>Loading…</td></tr>';
+
+      fetch("/events")
+        .then(r => {
+          if (r.status === 401) { window.location = "/.auth/login/aad?post_login_redirect_uri=/"; return null; }
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json();
+        })
+        .then(events => {
+          if (!events) return;
+
+          if (!events.length) {
+            tbody.innerHTML = '<tr class="state-row"><td colspan="11">No pipeline runs recorded yet.</td></tr>';
+            return;
+          }
+
+          _allEvents = events;
+          populateServiceFilter(events);
+
+          // Stats (always over full dataset)
+          const total = events.length;
+          const ok        = events.filter(e => e.status.toLowerCase() === "succeeded").length;
+          const fail      = events.filter(e => e.status.toLowerCase() === "failed").length;
+          const rollbacks = events.filter(e => e.isRollback).length;
+          const durations = events.map(e => e.durationSeconds).filter(Boolean);
+          const avgDur = durations.length
+            ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
+          const totalPass = events.reduce((a, e) => a + (e.testsPassed || 0), 0);
+          const totalFail = events.reduce((a, e) => a + (e.testsFailed || 0), 0);
+          const testRate = (totalPass + totalFail) > 0
+            ? Math.round((totalPass / (totalPass + totalFail)) * 100) + "%" : "—";
+
+          document.getElementById("stat-total").textContent    = total;
+          document.getElementById("stat-ok").textContent       = ok;
+          document.getElementById("stat-fail").textContent     = fail;
+          document.getElementById("stat-rollback").textContent = rollbacks;
+          document.getElementById("stat-tests").textContent    = testRate;
+          document.getElementById("stat-dur").textContent      = fmtDuration(avgDur);
+
+          applyFilters();
+        })
+        .catch(err => {
+          tbody.innerHTML = `<tr class="state-row"><td colspan="11">Error loading events: ${escHtml(String(err))}</td></tr>`;
+        });
+    }
+
+    function escHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // Load on page open
+    loadEvents();
+  </script>
+</body>
+</html>

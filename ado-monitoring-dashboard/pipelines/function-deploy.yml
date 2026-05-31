@@ -1,0 +1,221 @@
+# ============================================================================
+# ADO Monitoring Dashboard — Function App Deploy Pipeline
+# ============================================================================
+# Builds and deploys function-app/ to the Azure Function App.
+# Runs automatically on pushes to main that touch function-app/.
+#
+# AUTHENTICATION:
+#   Uses Workload Identity Federation (OIDC) — no stored secrets.
+#   Service connection: id-ado-dashboard-terraform
+# ============================================================================
+
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - function-app/**
+
+pr: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: ado-dashboard-secrets   # contains: subscriptionId (secret)
+  - name: serviceConnection
+    value: 'id-ado-dashboard-terraform'
+  - name: projectName
+    value: 'ado-dashboard'
+  - name: environment
+    value: 'dev'
+
+stages:
+  # ============================================================================
+  # Build — install deps locally and create the deployment zip
+  # Pre-installing avoids ORYX server-side build which can take 10+ minutes
+  # and causes AzureFunctionApp@2 polling to time out.
+  # ============================================================================
+  - stage: Build
+    displayName: 'Build Function App package'
+    jobs:
+      - job: BuildPackage
+        displayName: 'Install deps and zip function-app/'
+        steps:
+          - checkout: self
+
+          - task: UsePythonVersion@0
+            displayName: 'Use Python 3.11'
+            inputs:
+              versionSpec: '3.11'
+
+          - script: |
+              pip install \
+                --requirement "$(System.DefaultWorkingDirectory)/function-app/requirements.txt" \
+                --target "$(System.DefaultWorkingDirectory)/function-app/.python_packages/lib/site-packages" \
+                --upgrade
+            displayName: 'pip install dependencies'
+
+          - task: ArchiveFiles@2
+            displayName: 'Build deployment package'
+            inputs:
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)/function-app'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/function-app.zip'
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: 'Publish artifact'
+            inputs:
+              targetPath: '$(Build.ArtifactStagingDirectory)/function-app.zip'
+              artifactName: 'function-app'
+
+  # ============================================================================
+  # Deploy — push the zip to Azure and notify the dashboard
+  # ============================================================================
+  - stage: Deploy
+    displayName: 'Deploy to Azure'
+    dependsOn: Build
+    condition: succeeded('Build')
+    jobs:
+      - deployment: DeployFunctionApp
+        displayName: 'Deploy Function App'
+        environment: 'ado-dashboard-function'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  displayName: 'Discover Function App'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      RG="rg-$(projectName)-$(environment)"
+
+                      FUNCTION_APP_NAME=$(az functionapp list \
+                        --resource-group "$RG" \
+                        --query "[0].name" \
+                        --output tsv)
+
+                      echo "Function app: $FUNCTION_APP_NAME"
+                      echo "##vso[task.setvariable variable=functionAppName]$FUNCTION_APP_NAME"
+
+                      az functionapp config set \
+                        --name "$FUNCTION_APP_NAME" \
+                        --resource-group "$RG" \
+                        --linux-fx-version "PYTHON|3.11"
+
+                - task: AzureFunctionApp@2
+                  displayName: 'Deploy to Function App'
+                  inputs:
+                    connectedServiceNameARM: $(serviceConnection)
+                    appType: 'functionAppLinux'
+                    appName: '$(functionAppName)'
+                    package: '$(Pipeline.Workspace)/function-app/function-app.zip'
+                    runtimeStack: 'PYTHON|3.11'
+                    appSettings: '-FUNCTIONS_WORKER_RUNTIME python -AzureWebJobsFeatureFlags EnableWorkerIndexing -ENABLE_ORYX_BUILD false -SCM_DO_BUILD_DURING_DEPLOYMENT false'
+                    deploymentMethod: 'zipDeploy'
+
+                - task: AzureCLI@2
+                  displayName: 'Show Function App URL'
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      RG="rg-$(projectName)-$(environment)"
+                      FUNCTION_APP_NAME="$(functionAppName)"
+
+                      echo "Waiting for host to come back up..."
+                      sleep 20
+
+                      echo ""
+                      echo "================================================"
+                      HOSTNAME=$(az webapp show \
+                        --resource-group "$RG" \
+                        --name "$FUNCTION_APP_NAME" \
+                        --query "defaultHostName" \
+                        --output tsv 2>/dev/null || true)
+                      if [ -z "$HOSTNAME" ]; then
+                        HOSTNAME="$FUNCTION_APP_NAME.azurewebsites.net"
+                      fi
+                      echo "Dashboard URL: https://$HOSTNAME/"
+                      echo "================================================"
+
+                - task: AzureCLI@2
+                  displayName: 'Notify dashboard (function deploy succeeded)'
+                  continueOnError: true
+                  inputs:
+                    azureSubscription: $(serviceConnection)
+                    scriptType: 'bash'
+                    scriptLocation: 'inlineScript'
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      az account set --subscription "$(subscriptionId)"
+                      RG="rg-$(projectName)-$(environment)"
+                      FUNCTION_APP_NAME="$(functionAppName)"
+
+                      HOSTNAME=$(az webapp show \
+                        --resource-group "$RG" \
+                        --name "$FUNCTION_APP_NAME" \
+                        --query "defaultHostName" \
+                        --output tsv 2>/dev/null || true)
+                      if [ -z "$HOSTNAME" ]; then
+                        HOSTNAME="$FUNCTION_APP_NAME.azurewebsites.net"
+                      fi
+
+                      KV_NAME=$(az keyvault list \
+                        --resource-group "$RG" \
+                        --query "[0].name" \
+                        --output tsv)
+
+                      API_KEY=$(az keyvault secret show \
+                        --vault-name "$KV_NAME" \
+                        --name "dashboard-ingest-api-key" \
+                        --query "value" \
+                        --output tsv)
+
+                      FINISH_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+                      PAYLOAD=$(jq -n \
+                        --arg pipelineName "$(Build.DefinitionName)" \
+                        --arg buildId      "$(Build.BuildId)" \
+                        --arg buildNumber  "$(Build.BuildNumber)" \
+                        --arg branch       "$(Build.SourceBranch)" \
+                        --arg triggeredBy  "$(Build.RequestedFor)" \
+                        --arg projectName  "$(System.TeamProject)" \
+                        --arg repoName     "$(Build.Repository.Name)" \
+                        --arg environment  "$(environment)" \
+                        --arg finishTime   "$FINISH_TIME" \
+                        '{
+                          pipelineName:    $pipelineName,
+                          buildId:         $buildId,
+                          buildNumber:     $buildNumber,
+                          status:          "Succeeded",
+                          branch:          $branch,
+                          triggeredBy:     $triggeredBy,
+                          projectName:     $projectName,
+                          repositoryName:  $repoName,
+                          environment:     $environment,
+                          startTime:       $finishTime,
+                          finishTime:      $finishTime,
+                          durationSeconds: 0
+                        }')
+
+                      HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+                        -X POST \
+                        -H "Content-Type: application/json" \
+                        -H "x-api-key: $API_KEY" \
+                        -d "$PAYLOAD" \
+                        "https://${HOSTNAME}/events")
+
+                      echo "Dashboard notification: HTTP $HTTP_CODE"
+                      [ "$HTTP_CODE" = "204" ] || echo "::warning::Dashboard notification returned HTTP $HTTP_CODE"
