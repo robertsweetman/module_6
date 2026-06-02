@@ -19,7 +19,7 @@ Microsoft (2024). Integrate Key Vault with Azure Private Link. [online] learn.mi
 
 Microsoft (2025). Estimating consumption-based costs in Azure Functions. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/functions-consumption-costs?tabs=flex-consumption-plan%2Cportal [Accessed 29 MaY 2026]
 
-Microsoft (2026). Azure Functions Dedicated hosting. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/dedicated-plan [Accessed 30 May 2026].
+Microsoft (2026). Azure Functions Dedicated hosting. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/azure/azure-functions/dedicated-plan [Accessed 30 May 2026]
 ‌
 ‌Surya S (2023). History Of How Deployment Used to work & How Containerization revolutionized IT. [online] Medium. Available at: https://medium.com/@suryasaravanan2002/history-of-how-deployment-used-to-work-how-containerization-revolutionized-it-da785f4573ca [Accessed 3 May 2026].
 
