@@ -1,14 +1,41 @@
 # Develop Cloud Based Tool <!-- 1200 words -->
 
-IMPORTANT: REFER BACK TO THE FUNCTIONAL, NON-FUNCTIONAL and SECURITY requirements
+IMPORTANT: REFER BACK TO THE FUNCTIONAL, NON-FUNCTIONAL and SECURITY requirements here.
+
+
 
 ## Development Workflow
 
-Use Azure DevOps to capture all the tasks, split these into sprints, create milestones and report against those. Architectural design docs and so forth get published in the Azure DevOps wiki
+We used Azure DevOps boards to capture all the tasks, split these into sprints, create milestones and report against them. Tags were used (functional, non-functional, security) to make sure all the requirements were covered off and grouped for review against the intial specification. 
 
-TODO: add a Gantt chart here?
+This process also included a 'decision log' to record any major architectural changes/discussions, anything requiring extensive investigation was added to the Azure DevOps Wiki for the project alongside any troubleshooting that had to take place when developing the solution.
 
-TODO: Everything uses IaC - WHY?! (do we even have to explain this? It's 2026)
+As far as deploying the solution goes, we went down the function app (serverless) route as the most straight forward option available. Although containers could also have worked the additional networking/security to host these didn't justify the work. The function app presents an endpoint with a header token to avoid it being attacked by people posting malicious entries, as well as user control sitting behind Entra ID Easy Auth (TODO: check the name)
+
+This 'cloud native' (TODO: definition) approach is far more efficient than previously where your only option would have been to write an application and run it on a full server. 
+
+It 'could' be argued that having an Azure Serverless function restricts it's portability to other cloud providers (AWS, Google) but this would be the same sort of issue with a container runtime. We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved.
+
+```mermaid
+gantt
+    title Project Timeline
+    dateFormat YYYY-MM-DD
+    section Discovery
+    Requirements interviews              :a1, 2026-04-07, 5d
+    Mock up app using HTML / AI         :a2, after a1, 5d
+    Mock up feedback                    :a3, after a2, 4d
+    section Development
+    Sprint 1 - Deployment pipelines and app design  :a4, after a3, 14d
+    Sprint 2 - Deploy function app via Terraform    :a5, after a4, 14d
+    Sprint 3 - Automated deployment and testing     :a6, after a5, 14d
+    Sprint 4 - User feedback                        :a7, after a6, 14d
+    Sprint 5 - Project roundup                      :a8, after a7, 14d
+```
+Figure 2: Project Timeline
+
+Sprint 1 focusses on setting up deployment pipelines so that the project resources are created in Azure from the very beginning.
+
+Having this sort of automation from the start means it can be destroyed and recreated very easily as well as providing a safety net if someone makes a catastrophic mistake in configuration or deploying changes later. Terraform IaC (infrastructure as code) provides a (TODO: workshop this paragraph)
 
 ## Challenges encountered
 
@@ -17,9 +44,52 @@ Publishing from a pipeline run to an accessible but secure endpoint
 
 ### Event Design
 
+We need the actual event to be well designed and extensible, like a database schema as this is the core 'information unit' about a project and it's commit status.
+
+```python
+    entity = {
+        "PartitionKey": now.strftime("%Y-%m"),
+        "RowKey": str(body["buildId"]),
+        "PipelineName": str(body.get("pipelineName", "")),
+        "BuildNumber": str(body.get("buildNumber", "")),
+        "Status": str(body.get("status", "")),
+        "Branch": str(body.get("branch", "")),
+        "TriggeredBy": str(body.get("triggeredBy", "")),
+        "ProjectName": str(body.get("projectName", "")),
+        "RepositoryName": str(body.get("repositoryName", "")),
+        "Environment": str(body.get("environment", "")),
+        "StartTime": str(body.get("startTime", "")),
+        "FinishTime": str(body.get("finishTime", "")),
+        "DurationSeconds": int(body.get("durationSeconds", 0)),
+        "ReceivedAt": now.isoformat(),
+        # ── Enrichment fields (all optional) ────────────────────────────
+        "ServiceName": str(body.get("serviceName", "")),
+        "ReleaseVersion": str(body.get("releaseVersion", "")),
+        "CommitId": str(body.get("commitId", "")),
+        "CommitTimestamp": str(body.get("commitTimestamp", "")),
+        "PullRequestId": str(body.get("pullRequestId", "")),
+        "IsRollback": bool(body.get("isRollback", False)),
+        "FailureReason": str(body.get("failureReason", "")),
+        "FailedStage": str(body.get("failedStage", "")),
+        # Work item IDs stored as a JSON array string (Table Storage has no array type)
+        "WorkItemIds": json.dumps(body.get("workItemIds", [])),
+        "TestsPassed": int(body.get("testsPassed", 0)),
+        "TestsFailed": int(body.get("testsFailed", 0)),
+    }
+```
+Figure 3: Work Item Schema
 
 ### No-SQL dashboard design
 
+The dashboard was first mocked up by using AI (HTML) to give stakeholders an immediate glimpse as to what they'd be getting. This second round of feedback nased on looking at something real helped refine the final design
+
+![Overview](images/app.png)
+Figure 4: App Overview
+
+![Filter View](images/app_filtered.png)
+Figure 5: Filter View
+
+Allows users to filter to the service they're interested in and click on links to the repo changelog
 
 ### Azure DevOps security
 

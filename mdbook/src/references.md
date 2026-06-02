@@ -10,6 +10,9 @@ JetBrains (2026). What are the Benefits of CI/CD? | TeamCity CI/CD Guide. [onlin
 
 ‌John (2026). What Users Expect From Online Platforms in 2026. [online] TechJihad. Available at: https://techjihad.com/what-users-expect-from-online-platforms-in-2026/ [Accessed 10 May 2026].
 
+Le, S. (2025). Breaking Down Silos in Software Development with DevOps - CodeStringers. [online] CodeStringers. Available at: https://www.codestringers.com/insights/silos-in-software-development/ [Accessed 31 May, 2026]
+‌
+
 LEAD INNOVATIONZ (2025). Introduction Cloud computing has redefined the way businesses develop, deploy, and manage software. No longer constrained by physical infrastructure, organizations now leverage the cloud to drive innovation, boost efficiency, and scale at unprecedented speed. [online] Linkedin.com. Available at: https://www.linkedin.com/pulse/how-cloud-computing-transforming-modern-software-engineering-5vjyc [Accessed 3 May 2026].
 
 Microsoft (2024). Integrate Key Vault with Azure Private Link. [online] learn.microsoft.com. Available at: https://learn.microsoft.com/en-us/azure/key-vault/general/private-link-service?tabs=portal. [ Accessed 30 May]

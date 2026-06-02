@@ -1,6 +1,10 @@
 # Design Cloud Based Tool <!-- 1200 words -->
 
-## Requirements Gathering
+## Requirements Gathering Process
+
+This involved short (30 minutes max) stakeholder interviews to gather key requirements. Once common threads had been identified AI was used to generate a set of possible mock-ups to ensure that potential users were clear on how the information could be presented back to them.
+
+These were then split into functional, non-functional and security requirements. Security received it's own category due to its growing importance in solution design.
 
 ### Functional Requirements
 
@@ -98,6 +102,10 @@ The networking design must balance UK residency, secure access, and low-latency 
 - Performance and resilience: Keep ingestion and storage co-located and use retry/dead-letter plus geo-redundant storage where recovery objectives require it.
 - Network observability: Track dependency latency, throttling, and failed calls in Application Insights.
   - Add alarms for failed calls and health checking 
+
+
+![Resource map](images/resource_map.png)
+Figure 1: Azure Resource Map
 
 
 <!--

@@ -7,6 +7,7 @@ TODO: Highlight how this sort of observability and visibility is going to become
 Ongoing cost is very low with the projected bill for May being only about 25 pence.
 
 ![May 2026 costs](images/cost_may.png)
+Figure 5: Monthly subscription costs
 
 ROI in terms of time saved is therefore very high: 
 
@@ -18,9 +19,20 @@ ROI is therefore ridiculously high at > 230,000% or in other words for every £1
 
 ## Further enhancements and reliability
 
-Attach an MCP server to the database backend so people can ask natural language questions about project progress
+### Enhance AI Use
 
-Improve/expand the record schema to include more things - especially related to DORA metrics - refer back to these again
+We could attach an AI MCP server to the database backend so people can ask natural language questions about the various projects. 
+
+An example might be "Which service has had the most updates in the last 12 months?" or "Which project has the most failed deployments in the last month?" 
+
+This would be a significant useability enhancement which users could interact with via a text box in the site. Wiring this up to Azure's AI interface wouldn't be via Terraform (IaC) 
+
+
+### DORA metric comparison
+
+Improve/expand the record schema to include more things - especially related to DORA metrics - TODO: refer back to these again
+
+### Enhanced Observability
 
 Observability and Monitoring improvements possibly? What new things can be done with App Insights? Or do we just lob all the data/events into App Insights and use THAT for reporting even? Possibly less integration work and the framework/endpoint is already there!! 
 
