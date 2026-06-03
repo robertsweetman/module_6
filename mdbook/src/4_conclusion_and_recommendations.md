@@ -1,7 +1,5 @@
 # Conclusion and Recommendations <!-- 800 words -->
 
-TODO: Highlight how this sort of observability and visibility is going to become even more important as AI enables the INCREASE in deployment speed, change rate increases and so on <-- come up with a better way to describe this
-
 ## ROI
 
 Ongoing cost is very low with the projected bill for May being only about 25 pence.
@@ -21,31 +19,44 @@ ROI is therefore ridiculously high at > 230,000% or in other words for every £1
 
 ### Enhance AI Use
 
-We could attach an AI MCP server to the database backend so people can ask natural language questions about the various projects. 
+We could attach an AI MCP server to the database backend so people can ask natural language questions about the various projects.
 
-An example might be "Which service has had the most updates in the last 12 months?" or "Which project has the most failed deployments in the last month?" 
+An example might be "Which service has had the most updates in the last 12 months?" or "Which project has the most failed deployments in the last month?"
 
-This would be a significant useability enhancement which users could interact with via a text box in the site. Wiring this up to Azure's AI interface wouldn't be via Terraform (IaC) 
+This would be a significant useability enhancement which users could interact with via a text box in the site. Wiring this up to Azure's AI interface would be via Terraform (IaC) as with all the other resources.
 
+This would likely increase the cost upwards but given the useability improvements for stakeholders it would be worth upping the costs to £20 per month or more.
 
 ### DORA metric comparison
 
-Improve/expand the record schema to include more things - especially related to DORA metrics - TODO: refer back to these again
+We could improve the record schema to include more things - especially related to DORA metrics (Dora.dev, 2021) which are leading and lagging indicators for software development excellence.
 
-### Enhanced Observability
+#### Throughput
 
-Observability and Monitoring improvements possibly? What new things can be done with App Insights? Or do we just lob all the data/events into App Insights and use THAT for reporting even? Possibly less integration work and the framework/endpoint is already there!! 
+- Change lead time - time for a new feature from start to production usage
+- Deployment Frequency - number of deployments per time period
+- Failed Deployment Recovery Time - how long it takes to recover from a failed deployment
+
+#### Instability
+
+- Change Fail Rate - rate of deployments requiring immediate fixes
+- Deployment rework rate - ratio of deployments to fix prod issues
+
+These metrics can then benchmark the organisation against it's peers as opposed to taking an unreliable "finger in the air" view of the current state of development.
 
 ## Summary
 
 This cloud-based tool delivers a secure dashboard that shows application releases and deployment status across the organisation.
 
-It uses an event-driven architecture that posts Azure DevOps pipeline status messages which are picked up by Azure functions and stored in a NoSQL backend. The function app uses this backend as the basis for the dashboard which is only accessible via Entra ID access using 2FA. 
+It uses an event-driven architecture that posts Azure DevOps pipeline status messages which are picked up by Azure functions and stored in a NoSQL backend. The function app uses this backend as the basis for the dashboard which is only accessible via Entra ID access using 2FA.
 
 Application insights monitoring, especially around user logins, complete the security protecting this sensitive data.
 
 By making this information widely accessible across the organisation a high ROI is achieved by reducing status reporting meetings, cross team calls, faster triage of release based issues while running on low cost serverless and managed cloud resources.
- 
+
+In future developers will increase the frequency changes and make updates to software more often, primarily due to the introduction of AI.
+
+This will require more collaboration and understanding of the current state of software delivery across the business.
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===

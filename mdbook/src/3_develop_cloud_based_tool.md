@@ -4,7 +4,7 @@ IMPORTANT: REFER BACK TO THE FUNCTIONAL, NON-FUNCTIONAL and SECURITY requirement
 
 ## Development Workflow
 
-We used Azure DevOps boards to capture all the tasks, split these into sprints, create milestones and report against them. Tags were used (functional, non-functional, security) to make sure all the requirements were covered off and grouped for review against the intial specification. 
+We used Azure DevOps boards to capture all the tasks, split these into sprints, create milestones and report against them. Tags were used (functional, non-functional, security) to make sure all the requirements were covered off and grouped for review against the intial specification.
 
 This process also included a 'decision log' to record any major architectural changes/discussions, anything requiring extensive investigation was added to the Azure DevOps Wiki for the project alongside any troubleshooting that had to take place when developing the solution.
 
@@ -31,17 +31,19 @@ gantt
     Sprint 4 - User feedback                        :a7, after a6, 14d
     Sprint 5 - Project roundup                      :a8, after a7, 14d
 ```
+
 Figure 2: Project Timeline
 
 Sprint 1 focusses on setting up deployment pipelines so that the project resources are created in Azure from the very beginning.
 
-Having this sort of automation from the start means it can be destroyed and recreated very easily as well as providing a safety net if someone makes a catastrophic mistake in configuration or deploying changes later. 
+Having this sort of automation from the start means it can be destroyed and recreated very easily as well as providing a safety net if someone makes a catastrophic mistake in configuration or deploying changes later.
 
 Terraform IaC (infrastructure as code) provides a means automatically deploy infrastructure, keep a record of changes and allow multiple developers to work on the same Azure resources in parallel.
 
 ## Challenges encountered
 
 ### Publishing events
+
 Publishing from a pipeline run to an accessible but secure endpoint
 
 ### Event Design
@@ -79,6 +81,7 @@ We need the actual event to be well designed and extensible. It is effectively l
         "TestsFailed": int(body.get("testsFailed", 0)),
     }
 ```
+
 Figure 3: Work Item Schema
 
 ### No-SQL dashboard design
@@ -99,34 +102,44 @@ Allows users to filter to the service they're interested in and click on links t
 
 As part of the solution deployment we can take advantage of Azure DevOps pipeline controls which give admins the ability to 'lock down' code changes and deployments so best practices are followed.
 
-- PR's require another reviewer before merging into main
+- PR's require another code reviewer before merging into main
 - Running the application deployment pipeline for the azure function needs sign off by at least one other authorised team member
 - We can use static code analysis pipelines to measure code quality
-- We can also add pipeline steps to check the infrastructure (terraform) for security issues (REF: add link to trivvy here and sub-point about this)
+  - tflint looks at terraform code spacing and other formatting rules
+- We can also add pipeline steps to check the infrastructure (terraform) for security issues
+  - Trivy scans terraform configured resources to warn against configuration exploits and possible attack (Trivy, n.d.)
 
 ### Azure Function and Function App debugging
 
-
+Azure functions are easily linked to Application Insights, can log out to these for checking as well as send malformed requests to a dead letter queue for investigation. Microsoft strongly promote serverless functions so there is extensive documentation about debugging and monitoring these (Jarret Renshaw, 2026)
 
 ## Testing Methodology
 
-In order to meet the non-functional requirements (speed, security) etc. a tester was assigned to the project TODO: research testing methodologies - perf, resource utilization, COSTS - not just security. 
+In order to meet the non-functional requirements (speed, security) etc. a tester was assigned to the project. So this work was also visible to others on the project they used Azure DevOps test plans to raise bugs, record test runs and document their fundings - especially linking back to non-functional requirements like performance & useability.
 
-Is scalability an issue? Azure functions/function apps are inherantly scalable. 
+### Testing Scalability & UI Performance
 
-### Testing Scalability
+Taking a pragmatic view of this scenario, the application design and what it does won't be under significant load. Developer activity across the organisation would account for a few API updates a minute **at most** but you can still use App Insights to look at request times or even use Google Developer tools to look at page loads across different network speeds via a simulator (Chrome for Developers, n.d.)
 
 ### Maintainability
 
-### Easy roll-back
+Serverless functions can scale on demand so maintenance isn't an operational burden. This per-function scaling behaviour is a platform responsibility which the developer or support team don't have to manage.
+
+If this was a 'traditional' app running on a server then we'd have to maintain the server and apply security patches. Another illustration where 'cloud-native' wins over more traditional deployment approaches.
+
+### API Testing
+
+We can use a testing framework to inject junk calls to the API endoint or incorrectly structured data to make sure it's not accepted or partially complete. If needed we 'could' use the same automated approach to send a large number of API requests at the same time to make sure that the application copes with an unusually high load.
 
 ## Resilience and recovery from failure
 
-Since we've gone with an Infrastructure as Code (IaC) approach the greatest benefit this holds is that, if the host environment suffer a catastrophic failure, it can be rebuilt simply be re-running the deployment pipeline.
+Since we've gone with an Infrastructure as Code (IaC) approach the greatest benefit this holds is that, if the host environment suffer a catastrophic failure, it can be rebuilt simply be re-running the deployment pipeline. 
 
-TODO: Other IaC advantages
+We can set the azure function messaging to retry against failed calls it receives and should there be a wider outage it can be rebuilt elsewhere by changing one terraform variable: region.
 
-## Alternative architectures
+Beyond this there's also an auditable record of application changes available via the history in git.
+
+## Alternative architecture options
 
 ### Containers
 
@@ -135,7 +148,6 @@ Work is only going to be carried out on a per-change basis and with containers t
 ### Hosted Server
 
 Let's not host a website - that's so 2010's now (Function Apps FTW!!)
-
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===

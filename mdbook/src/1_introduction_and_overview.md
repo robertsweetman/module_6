@@ -32,24 +32,28 @@ With all this fast moving software development happening it's challenging for va
 
 Each stakeholder group has their own particular view and context:
 
-Developers & Testers
- - What application versions are deployed?
- - Are all environments (dev/test/production) on the same release?
- - Where a new version is in the pre-deployment test cycle
+### Developers & Testers
 
-Project & Release Managers
- - What versions are likely to be coming next?
- - Are there items that need resolving or are holding up progress?
- - Is there any sort of release pipeline holdup 
+- What application versions are deployed?
+- Are all environments (dev/test/production) on the same release?
+- Where a new version is in the pre-deployment test cycle
 
-Support
- - When was the last release/change made?
- - What was in it that might impact users or their experience? 
+### Project & Release Managers
 
-Business Owners
- - Is version 'x' with feature 'y' released yet?
- - How many sprints left till a particular feature is released?
- - Where in the feature delivery pipeline is a particula application?
+- What versions are likely to be coming next?
+- Are there items that need resolving or are holding up progress?
+- Is there any sort of release pipeline holdup
+
+### Support
+
+- When was the last release/change made?
+- What was in it that might impact users or their experience?
+
+### Business Owners
+
+- Is version 'x' with feature 'y' released yet?
+- How many sprints left till a particular feature is released?
+- Where in the feature delivery pipeline is a particula application?
   - Development/Testing/Live
 
 While Azure DevOps provides an individual 'per-project' view there's no single place where this sort of information can be surfaced across an organisation (Le, 2025)
@@ -58,7 +62,7 @@ While Azure DevOps provides an individual 'per-project' view there's no single p
 
 This cloud-based delivery status website provides a single, organisation-wide view of developers work, connecting code changes to the delivery of business outcomes across environments.
 
-It aligns with the software development lifecycle by surfacing the build, test and release cycles to a wider set of stakeholders.
+It aligns with the software development lifecycle by surfacing the build, test and release cycles to a wider set of stakeholders.I
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===

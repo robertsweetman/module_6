@@ -85,6 +85,10 @@ Additional platform substitutions:
 - Container Apps/AKS instead of Functions for long-running workloads or stricter container portability.
 - API Management in front of the Function App for throttling, versioning, and consumer governance.
 
+Quite a lot of these options are considerable overkill for what is effectivly a dashboard website over some api calls that update a table.
+
+Getting something in front of users as a starting point in order to receive product and user feedback is more valuable than over-engineering something that might be superceded by Microsoft or another vendor at some point.
+
 ### Networking Considerations
 
 The networking design must balance UK residency, secure access, and low-latency event flow.
@@ -92,17 +96,16 @@ The networking design must balance UK residency, secure access, and low-latency 
 - UK data boundary: Place queue, functions, storage, and telemetry in UK regions to meet residency requirements.
 - Secure ingress: Enforce Entra sign-in, MFA, and UK-only Conditional Access before Function App access is granted.
   - Conditional Access rules could also be extended to device level if necessary
-- Private service paths: Azure Private Endpoints assign a private IP address inside a Virtual Network to a managed service such as Azure Storage or Key Vault. Traffic between the Function App and those services then travels over the Azure backbone rather than the public internet, eliminating a class of network-level attack surface (Microsoft, 2024). VNet Integration allows the Function App's outbound calls to originate from a delegated subnet, which in turn enables network security group rules and private DNS zones to govern all egress. In this design the Function App, Storage Account, and Key Vault are candidates for private endpoint attachment once a supporting VNet is provisioned.
+- Private service paths: Azure Private Endpoints assign a private IP address inside a Virtual Network to a managed service such as Azure Storage or Key Vault. Traffic between the Function App and those services then travels over the Azure backbone rather than the public internet, eliminating a class of network-level attack surface (Microsoft, 2024).
+- VNet Integration allows the Function App's outbound calls to originate from a delegated subnet, which in turn enables network security group rules and private DNS zones to govern all egress. In this design the Function App, Storage Account, and Key Vault are candidates for private endpoint attachment once a supporting VNet is provisioned.
 - Controlled egress: Restrict outbound calls to approved Azure DevOps and Azure platform endpoints.
-  - This site is 'read only' so in fact no outbound calls should be possible.
+  - This site is 'read only' so in fact no outbound calls should be possible other than back to make filter view requests.
 - Performance and resilience: Keep ingestion and storage co-located and use retry/dead-letter plus geo-redundant storage where recovery objectives require it.
 - Network observability: Track dependency latency, throttling, and failed calls in Application Insights.
-  - Add alarms for failed calls and health checking 
-
+  - Add alarms for failed calls and health checking
 
 ![Resource map](images/resource_map.png)
 Figure 1: Azure Resource Map
-
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
