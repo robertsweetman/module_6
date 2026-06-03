@@ -7,7 +7,7 @@ Ongoing cost is very low with the projected bill for May being only about 25 pen
 ![May 2026 costs](images/cost_may.png)
 Figure 5: Monthly subscription costs
 
-ROI in terms of time saved is therefore very high: 
+ROI in terms of time saved is therefore very high.
 
 Even if across the whole business we save a dozen people about half an hour per week each avoiding chasing for stats updates...
 
@@ -54,9 +54,11 @@ Application insights monitoring, especially around user logins, complete the sec
 
 By making this information widely accessible across the organisation a high ROI is achieved by reducing status reporting meetings, cross team calls, faster triage of release based issues while running on low cost serverless and managed cloud resources.
 
-In future developers will increase the frequency changes and make updates to software more often, primarily due to the introduction of AI.
+Organisations should roll this out in phases with one ADO project, check the pipeline and event schema works and then onboarding the others. This reduces risk and will highlight any integration issues before users are exposed to the application.
 
-This will require more collaboration and understanding of the current state of software delivery across the business.
+As AI assisted coding increases deployment frequency the number and speed of pipeline events will grow. Organisations using AI already report a significant increase in commit frequency (GitHub, 2025) so a dashboard like this becomes more critical.
+
+Automated aggregation tracking dozens of changes across services lessens cognitive load and plugging in the DORA metrics extension into this view would also help the organisation guague whether their use of AI is genuinely improving stability or just speeding up their rate of failure.
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
