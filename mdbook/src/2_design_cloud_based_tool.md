@@ -4,7 +4,7 @@
 
 This involved short (30 minutes max) stakeholder interviews to gather key requirements. Once common threads had been identified AI was used to generate a set of possible mock-ups to ensure that potential users were clear on how the information could be presented back to them.
 
-These were then split into functional, non-functional and security requirements. Security received it's own category due to its growing importance in solution design.
+These were then split into functional, non-functional and security requirements. Security received it's own category due to its growing importance in solution design given the incoming onslaught of AI driven attacks (REF: add one here)
 
 ### Functional Requirements
 
@@ -12,12 +12,9 @@ Functional requirements define what the cloud-based delivery visibility tool mus
 
 - Aggregate delivery and release data from multiple Azure DevOps projects into a single organisation-wide view.
 - Show deployment status by environment (development, test, production) for each application or service.
-<!-- - Provide end-to-end traceability from change request/work item to build, test, and deployment outcome. -->
 - Display a timeline of recent releases with version number, deployment time, and impacted services.
-<!-- - Highlight failed pipelines, blocked releases, and environment drift between stages. -->
-<!-- - Provide role-based views for developers/testers, project and release managers, support, and business owners. -->
 - Support search and filtering by project, application, service, environment, release version, and status.
-<!-- - Provide reporting views for key delivery metrics such as deployment frequency, lead time, and change failure rate. -->
+- Accessible over mobile via a web browser if needed
 
 ### Non-Functional Requirements
 
@@ -28,10 +25,9 @@ Non-functional requirements define how well the tool must perform in terms of qu
 - Data freshness: Pipeline and deployment updates should be reflected within 5 minutes of source-system change.
 - Scalability: The solution should support growth to at least 200 services and 1,000 daily pipeline events without major redesign.
 - Reliability: Ingestion and processing should recover automatically from transient failures using retry and dead-letter handling.
-- Security: Access should use enterprise identity, role-based access control, and encryption in transit and at rest.
 - Maintainability: Infrastructure and deployment should be managed via IaC and CI/CD to reduce manual effort.
 - Usability: Core stakeholder tasks should be completed in three clicks or fewer.
-<!-- - Interoperability: The platform should allow extension to additional tooling sources beyond Azure DevOps with minimal rework. -->
+  - Filter function to drill into specific projects
 
 ### Security Requirements
 

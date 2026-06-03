@@ -2,21 +2,19 @@
 
 IMPORTANT: REFER BACK TO THE FUNCTIONAL, NON-FUNCTIONAL and SECURITY requirements here.
 
-
-
 ## Development Workflow
 
 We used Azure DevOps boards to capture all the tasks, split these into sprints, create milestones and report against them. Tags were used (functional, non-functional, security) to make sure all the requirements were covered off and grouped for review against the intial specification. 
 
 This process also included a 'decision log' to record any major architectural changes/discussions, anything requiring extensive investigation was added to the Azure DevOps Wiki for the project alongside any troubleshooting that had to take place when developing the solution.
 
-As far as deploying the solution goes, we went down the function app (serverless) route as the most straight forward option available. Although containers could also have worked the additional networking/security to host these didn't justify the work. The function app presents an endpoint with a header token to avoid it being attacked by people posting malicious entries, as well as user control sitting behind Entra ID Easy Auth (Microsoft Entra Sign In) as all users have Entra ID accounts (cephalin, 2025)
+As far as deploying the solution goes, we went down the function app (serverless) route as the most straight forward option available. Although containers could also have worked the additional networking/security to host these didn't justify the effort. The function app presents an endpoint with a header token to avoid it being attacked by people posting malicious entries, as well as user control sitting behind Entra ID Easy Auth (Microsoft Entra Sign In) as all users have Entra ID accounts (cephalin, 2025)
 
-This 'cloud native' deployment method is far more efficient than the historical approach where your only option would have been to write an application and run it on a full server. 
+This 'cloud native' deployment method is far more efficient than the historical approach where your only option would have been to write an application and run it on a full server. That would have also come with patching, security, os update and other networking/access headaches.
 
-It 'could' be argued that having an Azure Serverless function restricts it's portability to other cloud providers (AWS, Google) but this would be the same sort of issue with a container runtime. 
+It 'could' be argued that having an Azure Serverless function restricts it's portability to other cloud providers (AWS, Google) but this would be the same sort of issue with a container runtime. Another argument against could be that 'local' i.e. making and testing changes on a users machine isn't possible with serverless but nowadays Python, Rust and other serverless runtimes have full local language build support. You don't need to upload your function code to the cloud in order for it to run or be tested.
 
-We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved.
+We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved to another cloud with only minor tweaks.
 
 ```mermaid
 gantt
@@ -48,8 +46,8 @@ Publishing from a pipeline run to an accessible but secure endpoint
 
 ### Event Design
 
-We need the actual event to be well designed and extensible. It is effectively like a database schema or excel table and is the core 'information unit' about a project and it's commit status.
-s
+We need the actual event to be well designed and extensible. It is effectively like a database schema or excel table and is the core 'information unit' about a project and it's commit status which are defined in point 1 of the 'Functional Requirements'
+
 ```python
     entity = {
         "PartitionKey": now.strftime("%Y-%m"),
@@ -85,19 +83,26 @@ Figure 3: Work Item Schema
 
 ### No-SQL dashboard design
 
-The dashboard was first mocked up by using AI (HTML) to give stakeholders an immediate glimpse as to what they'd be getting. This second round of feedback nased on looking at something real helped refine the final design
+The dashboard was first mocked up by using AI (HTML) to give stakeholders an immediate glimpse as to what they'd be getting. This second round of feedback, driven by looking at something tangible, helped to refine the final design.
 
 ![Overview](images/app.png)
 Figure 4: App Overview
 
+Meets the key functional requirements showing the data from multiple projects in an organisation wide view alongside deployment status per environment.
+
 ![Filter View](images/app_filtered.png)
 Figure 5: Filter View
 
-Allows users to filter to the service they're interested in and click on links to the repo changelog
+Allows users to filter to the service they're interested in and click on links to the repo changelog for a more granular code change view.
 
 ### Azure DevOps security
 
-Who can publish what to where? Is sending a CURL event from a pipeline even a good idea?
+As part of the solution deployment we can take advantage of Azure DevOps pipeline controls which give admins the ability to 'lock down' code changes and deployments so best practices are followed.
+
+- PR's require a review before merging into main
+- Running the application deployment pipeline for the azure function needs sign off by at least one other authorised team member
+- We can use static code analysis pipelines to measure code quality
+- 
 
 ### Azure Function and Function App debugging
 

@@ -2,7 +2,7 @@
 
 ## Cloud Computing and Modern Software Development
 
-Moderns software development methodologies like Agile, Scrum etc. have relied heavily on the shift towards **on demand** based cloud based computing (Lead Innovationz, 2025).
+Modern software development methodologies like Agile, Scrum etc. have relied heavily on the shift towards **on demand** based cloud based computing (Lead Innovationz, 2025).
 
 These approaches leverage automation using CI/CD pipelines to enable rapid prototyping, innovation at scale and offer a commercial flexibility lacking in purely on-prem deployments (Surya S, 2023). 
 
@@ -56,15 +56,9 @@ While Azure DevOps provides an individual 'per-project' view there's no single p
 
 ## Solution Overview
 
-A cloud-based delivery visibility site provides a single, organisation-wide view of application and infrastructure status, connecting code changes to deployment outcomes across environments.
+This cloud-based delivery status website provides a single, organisation-wide view of developers work, connecting code changes to the delivery of business outcomes across environments.
 
-It aligns with the software development lifecycle by supporting planning, build, test, release, and live monitoring.
-
-![Resource map](images/resource_map.png)
-
-
-
-
+It aligns with the software development lifecycle by surfacing the build, test and release cycles to a wider set of stakeholders.
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
