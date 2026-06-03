@@ -4,6 +4,8 @@ about.gitlab.com. (2026). 4 Benefits of CI/CD. [online] Available at: https://ab
 
 azure.microsoft.com. (2026). Pricing - Functions | Microsoft Azure. [online] Available at: https://azure.microsoft.com/en-gb/pricing/details/functions/. [Accessed 1st June 2026]
 
+cephalin (2025). Configure Microsoft Entra Authentication - Azure App Service. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-provider-aad?tabs=workforce-configuration [Accessed 2nd June 2026].
+
 ‌Hava, T. (2020). Cattle vs Pets - DevOps Explained. [online] Hava.io. Available at: https://www.hava.io/blog/cattle-vs-pets-devops-explained [Accessed 3 May 2026].
 
 JetBrains (2026). What are the Benefits of CI/CD? | TeamCity CI/CD Guide. [online] JetBrains. Available at: https://www.jetbrains.com/teamcity/ci-cd-guide/benefits-of-ci-cd/. [Accessed 21 May 2026]

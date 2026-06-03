@@ -10,11 +10,13 @@ We used Azure DevOps boards to capture all the tasks, split these into sprints, 
 
 This process also included a 'decision log' to record any major architectural changes/discussions, anything requiring extensive investigation was added to the Azure DevOps Wiki for the project alongside any troubleshooting that had to take place when developing the solution.
 
-As far as deploying the solution goes, we went down the function app (serverless) route as the most straight forward option available. Although containers could also have worked the additional networking/security to host these didn't justify the work. The function app presents an endpoint with a header token to avoid it being attacked by people posting malicious entries, as well as user control sitting behind Entra ID Easy Auth (TODO: check the name)
+As far as deploying the solution goes, we went down the function app (serverless) route as the most straight forward option available. Although containers could also have worked the additional networking/security to host these didn't justify the work. The function app presents an endpoint with a header token to avoid it being attacked by people posting malicious entries, as well as user control sitting behind Entra ID Easy Auth (Microsoft Entra Sign In) as all users have Entra ID accounts (cephalin, 2025)
 
-This 'cloud native' (TODO: definition) approach is far more efficient than previously where your only option would have been to write an application and run it on a full server. 
+This 'cloud native' deployment method is far more efficient than the historical approach where your only option would have been to write an application and run it on a full server. 
 
-It 'could' be argued that having an Azure Serverless function restricts it's portability to other cloud providers (AWS, Google) but this would be the same sort of issue with a container runtime. We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved.
+It 'could' be argued that having an Azure Serverless function restricts it's portability to other cloud providers (AWS, Google) but this would be the same sort of issue with a container runtime. 
+
+We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved.
 
 ```mermaid
 gantt
@@ -35,7 +37,9 @@ Figure 2: Project Timeline
 
 Sprint 1 focusses on setting up deployment pipelines so that the project resources are created in Azure from the very beginning.
 
-Having this sort of automation from the start means it can be destroyed and recreated very easily as well as providing a safety net if someone makes a catastrophic mistake in configuration or deploying changes later. Terraform IaC (infrastructure as code) provides a (TODO: workshop this paragraph)
+Having this sort of automation from the start means it can be destroyed and recreated very easily as well as providing a safety net if someone makes a catastrophic mistake in configuration or deploying changes later. 
+
+Terraform IaC (infrastructure as code) provides a means automatically deploy infrastructure, keep a record of changes and allow multiple developers to work on the same Azure resources in parallel.
 
 ## Challenges encountered
 
@@ -44,8 +48,8 @@ Publishing from a pipeline run to an accessible but secure endpoint
 
 ### Event Design
 
-We need the actual event to be well designed and extensible, like a database schema as this is the core 'information unit' about a project and it's commit status.
-
+We need the actual event to be well designed and extensible. It is effectively like a database schema or excel table and is the core 'information unit' about a project and it's commit status.
+s
 ```python
     entity = {
         "PartitionKey": now.strftime("%Y-%m"),
