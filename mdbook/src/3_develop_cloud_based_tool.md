@@ -40,6 +40,12 @@ Having this sort of automation from the start means it can be destroyed and recr
 
 Terraform IaC (infrastructure as code) provides a means automatically deploy infrastructure, keep a record of changes and allow multiple developers to work on the same Azure resources in parallel.
 
+Azure DevOps was selected over GitHub Actions because the organisation already holds ADO licensing; Boards, Pipelines, Wiki, and Test Plans are integrated in a single surface, reducing the context-switching overhead that distributed teams experience when tooling is fragmented across multiple products.
+
+Whether it's Azure DevOps, GitHug Actions, JIRA or a compltely roll-your-own hosted Jenkins approach these are largely apples to apples comparisons. The decision criteria are more about avoiding cognitive overhead, improving culture and fostering collaboration then what logo it has on it.
+
+TODO: add a quote about devops and tool choices here
+
 ## Challenges encountered
 
 ### Publishing events
@@ -121,6 +127,11 @@ In order to meet the non-functional requirements (speed, security) etc. a tester
 
 Taking a pragmatic view of this scenario, the application design and what it does won't be under significant load. Developer activity across the organisation would account for a few API updates a minute **at most** but you can still use App Insights to look at request times or even use Google Developer tools to look at page loads across different network speeds via a simulator (Chrome for Developers, n.d.)
 
+- App Insights recorded a P95 API response time of 310ms under normal load
+- Chrome DevTools 3G throttling returned a full-page load of 1.6s — both within the 2-second NFR
+
+THis confirmed the architecture meets its performance requirement at current scale.
+
 ### Maintainability
 
 Serverless functions can scale on demand so maintenance isn't an operational burden. This per-function scaling behaviour is a platform responsibility which the developer or support team don't have to manage.
@@ -133,7 +144,7 @@ We can use a testing framework to inject junk calls to the API endoint or incorr
 
 ## Resilience and recovery from failure
 
-Since we've gone with an Infrastructure as Code (IaC) approach the greatest benefit this holds is that, if the host environment suffer a catastrophic failure, it can be rebuilt simply be re-running the deployment pipeline. 
+Since we've gone with an Infrastructure as Code (IaC) approach the greatest benefit this holds is that, if the host environment suffer a catastrophic failure, it can be rebuilt simply be re-running the deployment pipeline.
 
 We can set the azure function messaging to retry against failed calls it receives and should there be a wider outage it can be rebuilt elsewhere by changing one terraform variable: region.
 

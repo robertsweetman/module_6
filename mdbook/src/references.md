@@ -8,6 +8,9 @@ cephalin (2025). Configure Microsoft Entra Authentication - Azure App Service. [
 
 Chrome for Developers. (n.d.). Simulate mobile devices with device mode | Chrome DevTools. [online] Available at: https://developer.chrome.com/docs/devtools/device-mode. [Accessed 3 June 2026]
 
+Github Staff. (2025). Octoverse: A new developer joins GitHub every second as AI leads TypeScript to #1. [online] The GitHub Blog. Available at: https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/ [Accessed 3 June 2025]
+‌
+
 ‌Hava, T. (2020). Cattle vs Pets - DevOps Explained. [online] Hava.io. Available at: https://www.hava.io/blog/cattle-vs-pets-devops-explained [Accessed 3 May 2026].
 
 JarrettRenshaw (2026). Application Insights logs are missing or incorrect - Azure. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/troubleshoot/azure/azure-functions/monitoring/functions-monitoring-appinsightslogs [Accessed 3 Jun. 2026].

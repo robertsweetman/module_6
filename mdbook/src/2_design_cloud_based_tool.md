@@ -107,6 +107,12 @@ The networking design must balance UK residency, secure access, and low-latency 
 ![Resource map](images/resource_map.png)
 Figure 1: Azure Resource Map
 
+## Changes during the build process
+
+1. User feedback to the initial HTML/wireframe was that there needed to be a filter view at the beginning of go  live, not as a feature to be added later
+2. There were concerns about using NoSQL as opposed to a more structured and queriable database format but the suggestion to attach an MCP server to this afterwards removed this objection
+3. Concerns were raised about scalability but looking at the initial number of changes per day this was dismissed as irrelevant for at least the next 12 months
+
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
 

@@ -4,13 +4,23 @@
 
 Modern software development methodologies like Agile, Scrum etc. have relied heavily on the shift towards **on demand** based cloud based computing (Lead Innovationz, 2025).
 
-These approaches leverage automation using CI/CD pipelines to enable rapid prototyping, innovation at scale and offer a commercial flexibility lacking in purely on-prem deployments (Surya S, 2023). 
+These approaches leverage automation using CI/CD pipelines to enable rapid prototyping, innovation at scale and offer a commercial flexibility lacking in purely on-prem deployments (Surya S, 2023).
 
 Containerisation and Serverless are the epitome of this approach where application running costs can be directly linked to business revenue and even per API requests in the case of serverless. (azure.microsoft.com, June 2026)
 
 The move from multi-week on-prem deployments to a service model can be summed up in the phrase "cattle, not pets" as described by the DevOps movement (Hava, 2020). Resources become ephemeral and disposable.
 
 Infrastructure automation tools like Terraform, Bicep (Azure), Cloudfront (AWS) enable the flexibility to stand services up, turn them off and then rebuild them at the touch of a button.
+
+### Networking - A Core Cloud Component
+
+We're sending Azure DevOps triggers across the the public internet through Azure's global DNS and TLS termination, then through Entra ID Conditional Access, before reaching the Function App.
+
+For a read-heavy dashboard, **latency** is the dominant quality-of-service concern over throughput because the user base are looking for a short page load.
+
+Putting all the azure backend components in the same region minimises round-trip latency compared to a hub/spoke model, which would add cross-VNet hops without meaningful security benefit for a single-tenant internal tool.
+
+Queue-based decoupling between Azure DevOps and the ingestion function absorbs burst traffic and protects Table Storage from write spikes, providing a natural QoS boundary between the event-producing and event-consuming layers of the architecture.
 
 ## From "Move Fast and Break Things" to Stability
 

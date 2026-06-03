@@ -44,6 +44,12 @@ We could improve the record schema to include more things - especially related t
 
 These metrics can then benchmark the organisation against it's peers as opposed to taking an unreliable "finger in the air" view of the current state of development.
 
+### Scalability Upgrade Triggers
+
+If monthly event volume did manage to exceed 50,000 rows or dashboard query latency increases then migrating the NoSQL backend from Azure Table Storage to Cosmos DB would add richer indexing with minimal schema change. Replacing Queue Storage with Azure Service Bus would add further queue handling functionality.
+
+Both upgrades would be deliverable via Terraform without architectural rework.
+
 ## Summary
 
 This cloud-based tool delivers a secure dashboard that shows application releases and deployment status across the organisation.
@@ -56,7 +62,7 @@ By making this information widely accessible across the organisation a high ROI 
 
 Organisations should roll this out in phases with one ADO project, check the pipeline and event schema works and then onboarding the others. This reduces risk and will highlight any integration issues before users are exposed to the application.
 
-As AI assisted coding increases deployment frequency the number and speed of pipeline events will grow. Organisations using AI already report a significant increase in commit frequency (GitHub, 2025) so a dashboard like this becomes more critical.
+As AI assisted coding increases deployment frequency the number and speed of pipeline events will grow. Organisations using AI already report a significant increase in commit frequency (GitHub Staff, 2025) so a dashboard like this becomes more critical.
 
 Automated aggregation tracking dozens of changes across services lessens cognitive load and plugging in the DORA metrics extension into this view would also help the organisation guague whether their use of AI is genuinely improving stability or just speeding up their rate of failure.
 
