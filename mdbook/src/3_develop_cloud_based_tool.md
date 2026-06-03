@@ -99,18 +99,26 @@ Allows users to filter to the service they're interested in and click on links t
 
 As part of the solution deployment we can take advantage of Azure DevOps pipeline controls which give admins the ability to 'lock down' code changes and deployments so best practices are followed.
 
-- PR's require a review before merging into main
+- PR's require another reviewer before merging into main
 - Running the application deployment pipeline for the azure function needs sign off by at least one other authorised team member
 - We can use static code analysis pipelines to measure code quality
-- 
+- We can also add pipeline steps to check the infrastructure (terraform) for security issues (REF: add link to trivvy here and sub-point about this)
 
 ### Azure Function and Function App debugging
+
+
 
 ## Testing Methodology
 
 In order to meet the non-functional requirements (speed, security) etc. a tester was assigned to the project TODO: research testing methodologies - perf, resource utilization, COSTS - not just security. 
 
 Is scalability an issue? Azure functions/function apps are inherantly scalable. 
+
+### Testing Scalability
+
+### Maintainability
+
+### Easy roll-back
 
 ## Resilience and recovery from failure
 
