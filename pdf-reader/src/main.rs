@@ -3,7 +3,7 @@ use std::{env, fs};
 
 fn main() {
     let path = env::args().nth(1).unwrap_or_else(|| {
-        "../sources/SWE1002-6_Cloud Computing Project.pdf".to_string()
+        "../sources/SWE1002-6_Cloud Computing Project (2).pdf".to_string()
     });
 
     let output_path = env::args().nth(2).unwrap_or_else(|| {
