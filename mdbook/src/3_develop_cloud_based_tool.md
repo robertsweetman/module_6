@@ -1,20 +1,16 @@
 # Develop Cloud Based Tool <!-- 1200 words -->
 
-IMPORTANT: REFER BACK TO THE FUNCTIONAL, NON-FUNCTIONAL and SECURITY requirements here.
-
 ## Development Workflow
 
 We used Azure DevOps boards to capture all the tasks, split these into sprints, create milestones and report against them. Tags were used (functional, non-functional, security) to make sure all the requirements were covered off and grouped for review against the intial specification.
 
 This process also included a 'decision log' to record any major architectural changes/discussions, anything requiring extensive investigation was added to the Azure DevOps Wiki for the project alongside any troubleshooting that had to take place when developing the solution.
 
-As far as deploying the solution goes, we went down the function app (serverless) route as the most straight forward option available. Although containers could also have worked the additional networking/security to host these didn't justify the effort. The function app presents an endpoint with a header token to avoid it being attacked by people posting malicious entries, as well as user control sitting behind Entra ID Easy Auth (Microsoft Entra Sign In) as all users have Entra ID accounts (cephalin, 2025)
+The function app (serverless) route was chosen over containers as the additional networking overhead wasn't justified. The Function App presents an endpoint with a header token to prevent malicious ingestion, and user access sits behind Entra ID Easy Auth (cephalin, 2025).
 
-This 'cloud native' deployment method is far more efficient than the historical approach where your only option would have been to write an application and run it on a full server. That would have also come with patching, security, os update and other networking/access headaches.
+This cloud-native approach avoids the OS patching, security updates, and infrastructure management of a traditional hosted server. While Azure Functions limit direct portability to other cloud providers, local development is fully supported — Python and other runtimes can be built and tested without deploying to the cloud.
 
-It 'could' be argued that having an Azure Serverless function restricts it's portability to other cloud providers (AWS, Google) but this would be the same sort of issue with a container runtime. Another argument against could be that 'local' i.e. making and testing changes on a users machine isn't possible with serverless but nowadays Python, Rust and other serverless runtimes have full local language build support. You don't need to upload your function code to the cloud in order for it to run or be tested.
-
-We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved to another cloud with only minor tweaks.
+We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved to another cloud with only minor tweaks. This is the important business logic part.
 
 ```mermaid
 gantt
@@ -38,23 +34,21 @@ Sprint 1 focusses on setting up deployment pipelines so that the project resourc
 
 Having this sort of automation from the start means it can be destroyed and recreated very easily as well as providing a safety net if someone makes a catastrophic mistake in configuration or deploying changes later.
 
-Terraform IaC (infrastructure as code) provides a means automatically deploy infrastructure, keep a record of changes and allow multiple developers to work on the same Azure resources in parallel.
+Terraform Infrastructure as Code (IaC) provides a way toautomatically deploy infrastructure, keep a record of changes and allows multiple developers to work on the same Azure resources in parallel.
 
 Azure DevOps was selected over GitHub Actions because the organisation already holds ADO licensing; Boards, Pipelines, Wiki, and Test Plans are integrated in a single surface, reducing the context-switching overhead that distributed teams experience when tooling is fragmented across multiple products.
 
-Whether it's Azure DevOps, GitHug Actions, JIRA or a compltely roll-your-own hosted Jenkins approach these are largely apples to apples comparisons. The decision criteria are more about avoiding cognitive overhead, improving culture and fostering collaboration then what logo it has on it.
-
-TODO: add a quote about devops and tool choices here
+Whether Azure DevOps, GitHub Actions, JIRA, or a self-hosted Jenkins instance, the goal is consistent: track work in progress, share information, and foster collaboration.
 
 ## Challenges encountered
 
 ### Publishing events
 
-Publishing from a pipeline run to an accessible but secure endpoint
+Publishing from a pipeline run to an accessible but secure endpoint went through a numnber of iterations as to which Python library to use. We had to temporarily enable App Insights to debug why the app deploymnet wasn't working.
 
 ### Event Design
 
-We need the actual event to be well designed and extensible. It is effectively like a database schema or excel table and is the core 'information unit' about a project and it's commit status which are defined in point 1 of the 'Functional Requirements'
+We needed the actual event to be well designed and extensible. It is effectively like a database schema or excel table and is the core 'information unit' about a project and it's commit status which are defined in point 1 of the 'Functional Requirements'
 
 ```python
     entity = {
@@ -111,7 +105,7 @@ As part of the solution deployment we can take advantage of Azure DevOps pipelin
 - PR's require another code reviewer before merging into main
 - Running the application deployment pipeline for the azure function needs sign off by at least one other authorised team member
 - We can use static code analysis pipelines to measure code quality
-  - tflint looks at terraform code spacing and other formatting rules
+  - Tflint looks at terraform code spacing and other formatting rules
 - We can also add pipeline steps to check the infrastructure (terraform) for security issues
   - Trivy scans terraform configured resources to warn against configuration exploits and possible attack (Trivy, n.d.)
 
@@ -125,18 +119,16 @@ In order to meet the non-functional requirements (speed, security) etc. a tester
 
 ### Testing Scalability & UI Performance
 
-Taking a pragmatic view of this scenario, the application design and what it does won't be under significant load. Developer activity across the organisation would account for a few API updates a minute **at most** but you can still use App Insights to look at request times or even use Google Developer tools to look at page loads across different network speeds via a simulator (Chrome for Developers, n.d.)
+Taking a pragmatic view of this scenario, the application won't be under significant load. Developer activity across the organisation would account for a few API updates a minute **at most** but App Insights can still be used to look at request times or even use Google Developer tools to look at page loads across different network speeds via a simulator (Chrome for Developers, n.d.)
 
 - App Insights recorded a P95 API response time of 310ms under normal load
 - Chrome DevTools 3G throttling returned a full-page load of 1.6s — both within the 2-second NFR
 
-THis confirmed the architecture meets its performance requirement at current scale.
+This confirmed the architecture meets its performance requirement at current scale.
 
 ### Maintainability
 
-Serverless functions can scale on demand so maintenance isn't an operational burden. This per-function scaling behaviour is a platform responsibility which the developer or support team don't have to manage.
-
-If this was a 'traditional' app running on a server then we'd have to maintain the server and apply security patches. Another illustration where 'cloud-native' wins over more traditional deployment approaches.
+Serverless functions scale on demand; per-function scaling is a platform responsibility, not a developer or support burden. This eliminates the OS patching and security update overhead of a traditionally hosted application.
 
 ### API Testing
 
@@ -144,9 +136,9 @@ We can use a testing framework to inject junk calls to the API endoint or incorr
 
 ## Resilience and recovery from failure
 
-Since we've gone with an Infrastructure as Code (IaC) approach the greatest benefit this holds is that, if the host environment suffer a catastrophic failure, it can be rebuilt simply be re-running the deployment pipeline.
+Since we've gone with an Infrastructure as Code approach the greatest benefit is that, if the host environment suffer a catastrophic failure, it can be rebuilt by re-running the deployment pipeline.
 
-We can set the azure function messaging to retry against failed calls it receives and should there be a wider outage it can be rebuilt elsewhere by changing one terraform variable: region.
+We can also set the azure function messaging to retry against failed calls it receives and should there be a wider outage it can be rebuilt elsewhere by changing one terraform variable: region.
 
 Beyond this there's also an auditable record of application changes available via the history in git.
 
@@ -154,11 +146,11 @@ Beyond this there's also an auditable record of application changes available vi
 
 ### Containers
 
-Work is only going to be carried out on a per-change basis and with containers there's actually 'too much' network/infra overhead to justify this. We'd need a queue anyway so... might as well go full serverless...
+Containers carry network and infrastructure overhead not warranted for a dashboard that only updates per pipeline event; serverless simply presents an endpoint.
 
 ### Hosted Server
 
-Let's not host a website - that's so 2010's now (Function Apps FTW!!)
+A full hosted server adds OS and web-server management that is unnecessary for an application of this simplicity.
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===

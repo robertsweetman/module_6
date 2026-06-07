@@ -18,7 +18,7 @@ Mark Zuckerberg announced in 2014 that Meta's internal motto would change from "
 
 Empowering dozens of engineering teams to make daily changes across different applications and repositories requires automation to build test environments, deployment pipelines and being able to see infrastructure changes over time.
 
-Having an at-a-glance way to see what's been deployed when and where allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up the process of modern software development. 
+Having an at-a-glance way to see what's been deployed when and where allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up the process of modern software development.
 
 Leveraging CI/CD confers a dozen distinct advantages over organisations that don't use this development pattern (JetBrains, 2026).
 

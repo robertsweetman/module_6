@@ -78,20 +78,14 @@ In this model, Azure DevOps emits pipeline outcomes to a queue, an ingestion fun
 
 Azure Table Storage is the baseline because it is low cost, simple, and well suited to key-value release events. Viable alternatives are:
 
-- Azure Cosmos DB: Prefer when low-latency global scale or richer querying is required; trade-off is higher cost.
-- Azure SQL Database: Prefer when relational joins and structured reporting are central; trade-off is tighter schema and more administration.
-- Azure Data Explorer/Log Analytics: Prefer for large-scale time-series and operational analytics; trade-off is less suitability for transactional API reads.
-- Blob Storage (parquet/json): Best for low-cost archive/history; trade-off is not suitable as the live dashboard store.
+- Azure Cosmos DB: low-latency global scale or richer querying; higher cost trade-off.
+- Azure SQL Database: relational joins and structured reporting; tighter schema and more administration.
+- Azure Data Explorer/Log Analytics: large-scale time-series analytics; less suited to transactional API reads.
+- Blob Storage: low-cost archive; not suitable as the live dashboard store.
 
-Additional platform substitutions:
+Additional substitutions: Azure Service Bus for ordered messaging; Container Apps/AKS for long-running workloads; API Management for throttling and versioning.
 
-- Azure Service Bus instead of Queue Storage for ordered processing and advanced messaging controls.
-- Container Apps/AKS instead of Functions for long-running workloads or stricter container portability.
-- API Management in front of the Function App for throttling, versioning, and consumer governance.
-
-Quite a lot of these options are considerable overkill for what is effectivly a dashboard website over some api calls that update a table.
-
-Getting something in front of users as a starting point in order to receive product and user feedback is more valuable than over-engineering something that might be superceded by Microsoft themselves releasing a new feature into Azure DevOps that addresses the defecit we're looking to fill with this tool.
+Most of these are overkill for a dashboard over a single table. Getting something in front of users quickly is more valuable than over-engineering a solution that a future Azure DevOps native feature may supersede.
 
 ### Networking Considerations
 
@@ -105,11 +99,29 @@ The networking design must balance UK residency, secure access, and low-latency 
 - Controlled egress: Restrict outbound calls to approved Azure DevOps and Azure platform endpoints.
   - This site is 'read only' so in fact no outbound calls should be possible other than back to make filter view requests.
 - Performance and resilience: Keep ingestion and storage co-located and use retry/dead-letter plus geo-redundant storage where recovery objectives require it.
-- Network observability: Track dependency latency, throttling, and failed calls in Application Insights.
-  - Add alarms for failed calls and health checking
+- Network observability: Track dependency latency, throttling, and failed calls in Application Insights; add alarms and health checks.
 
 ![Resource map](images/resource_map.png)
-Figure 2: Azure Resource Map
+Figure 2: Azure Resource Map shows:
+
+- Managed identity for deploying resources into Azure via Terraform
+- Storage Account for Table storage
+- Keyvault for the Entra app client secret and Ingest API key
+- Storage Account for Terraform back-end state file
+- The App service (function app)
+- The App Service Plan (underlying compute)
+
+## Secrets in the KeyVault
+
+These are only accessed at runtime by the function app's managed identity as security measures.
+
+### dashboard-ingest-api-key
+
+A randomly generated token that all ADO pipelines must include in their request header. This tells the function app ingesiton endpoint that the write request is legitimate.
+
+### dashboard-api-client-secret
+
+This is the application's own password with Microsoft. When a user signs in, Entra ID sends an authorisation code back to the Function App. Easy Auth must then exchange that code for a token by proving it is the registered application — it does this using this secret.
 
 ## Changes during the build process
 
@@ -119,9 +131,9 @@ As part of the development process reviews were carried out with stakeholders at
 2. There were concerns about using NoSQL as opposed to a more structured and queriable database format but the suggestion to attach an MCP server to this afterwards removed this objection
 3. Concerns were raised about scalability but looking at the initial number of changes per day this was dismissed as irrelevant for at least the next 12 months
 
-The Product Manager was able to focus people back to the delivery of an initial MVP (Minimal Viable Product) on which iterations and improvements could be made later.
+The Product Manager was able to focus people back to the delivery of an initial MVP (Minimal Viable Product) on which iterations and improvements could be made later rather than a polished final product.
 
-Perfect is the Enemy of Good - Wikipedia, 2020 (TODO: fix formatting)
+"Perfect is the Enemy of Good" (Wikipedia, 2020)
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===
