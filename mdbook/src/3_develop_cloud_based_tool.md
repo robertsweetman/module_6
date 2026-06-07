@@ -10,7 +10,9 @@ The function app (serverless) route was chosen over containers as the additional
 
 This cloud-native approach avoids the OS patching, security updates, and infrastructure management of a traditional hosted server. While Azure Functions limit direct portability to other cloud providers, local development is fully supported — Python and other runtimes can be built and tested without deploying to the cloud.
 
-We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability - the function code could still be easily moved to another cloud with only minor tweaks. This is the important business logic part.
+We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability.
+
+The function code could still be easily moved to another cloud with only minor tweaks.
 
 ```mermaid
 gantt
@@ -136,11 +138,16 @@ We can use a testing framework to inject junk calls to the API endoint or incorr
 
 ## Resilience and recovery from failure
 
-Since we've gone with an Infrastructure as Code approach the greatest benefit is that, if the host environment suffer a catastrophic failure, it can be rebuilt by re-running the deployment pipeline.
+Because the entire environment is defined in Terraform (IaC), recovery means re-running the deployment pipeline rather than manual rebuilding. We can then evaluate the design against various failure scenarios:
 
-We can also set the azure function messaging to retry against failed calls it receives and should there be a wider outage it can be rebuilt elsewhere by changing one terraform variable: region.
+| Failure scenario | Mitigation | Recovery |
+| --- | --- | --- |
+| Regional outage | Single `region` variable | Re-deploy to an alternate UK region |
+| Catastrophic resource loss | All resources codified | Pipeline rebuild from version control |
+| Poison / malformed event | Queue retry then dead-letter | Replay once fixed |
+| Auth provider disruption | Easy Auth fails closed | Restored when Entra ID recovers |
 
-Beyond this there's also an auditable record of application changes available via the history in git.
+The common thread is that infrastructure, configuration and application logic are all in version-controlled code, so every scenario is fixed by a repeatable rebuild rather than debugging. Git history also provides a full audit trail.
 
 ## Alternative architecture options
 

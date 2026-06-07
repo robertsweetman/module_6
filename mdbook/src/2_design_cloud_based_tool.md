@@ -2,7 +2,7 @@
 
 ## Requirements Gathering Process
 
-This involved short (30 minutes max) stakeholder interviews to gather key requirements. Once common threads had been identified AI was used to generate a set of possible mock-ups to ensure that potential users were clear on how the information could be presented back to them.
+Short (30 minutes max) stakeholder interviews gathered key requirements. Once common threads emerged, AI generated mock-ups so users could see how the information might be presented back to them.
 
 These were then split into functional, non-functional and security requirements. Security received it's own category due to its growing importance in solution design given the incoming onslaught of AI driven attacks (Hassan, 2025)
 
@@ -125,13 +125,13 @@ This is the application's own password with Microsoft. When a user signs in, Ent
 
 ## Changes during the build process
 
-As part of the development process reviews were carried out with stakeholders at the end of each sprint. Part of the Product Managment role within the development team was to handle queries and concerns raised by various stakeholders.
+Sprint reviews with stakeholders allowed the Product Manager to handle queries and concerns as they arose.
 
 1. User feedback to the initial HTML/wireframe was that there needed to be a filter view at the beginning of go live, not as a feature to be added later
 2. There were concerns about using NoSQL as opposed to a more structured and queriable database format but the suggestion to attach an MCP server to this afterwards removed this objection
 3. Concerns were raised about scalability but looking at the initial number of changes per day this was dismissed as irrelevant for at least the next 12 months
 
-The Product Manager was able to focus people back to the delivery of an initial MVP (Minimal Viable Product) on which iterations and improvements could be made later rather than a polished final product.
+The Product Manager refocused the team on delivering an initial MVP (Minimal Viable Product) for later iteration rather than a polished final product.
 
 "Perfect is the Enemy of Good" (Wikipedia, 2020)
 
