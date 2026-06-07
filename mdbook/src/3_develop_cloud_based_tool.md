@@ -88,19 +88,19 @@ We need the actual event to be well designed and extensible. It is effectively l
     }
 ```
 
-Figure 3: Work Item Schema
+Figure 4: Work Item Schema
 
 ### No-SQL dashboard design
 
 The dashboard was first mocked up by using AI (HTML) to give stakeholders an immediate glimpse as to what they'd be getting. This second round of feedback, driven by looking at something tangible, helped to refine the final design.
 
 ![Overview](images/app.png)
-Figure 4: App Overview
+Figure 5: App Overview
 
 Meets the key functional requirements showing the data from multiple projects in an organisation wide view alongside deployment status per environment.
 
 ![Filter View](images/app_filtered.png)
-Figure 5: Filter View
+Figure 6: Filter View
 
 Allows users to filter to the service they're interested in and click on links to the repo changelog for a more granular code change view.
 

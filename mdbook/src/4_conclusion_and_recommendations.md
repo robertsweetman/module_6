@@ -2,10 +2,10 @@
 
 ## ROI
 
-Ongoing cost is very low with the projected bill for May being only about 25 pence.
+Ongoing cost is very low with the projected bill for May being only about 25 pence althought he app service machine this is running on costs about £10 per month total.
 
 ![May 2026 costs](images/cost_may.png)
-Figure 5: Monthly subscription costs
+Figure 7: Monthly subscription costs
 
 ROI in terms of time saved is therefore very high.
 
@@ -13,7 +13,7 @@ Even if across the whole business we save a dozen people about half an hour per 
 
 12 (people) x 0.5 (half an hour) x 24 (hourly rate in GBP) x 4 (weeks per month) = £576 per month
 
-ROI is therefore ridiculously high at > 230,000% or in other words for every £1 spent on the solution it returns over £2300
+ROI is therefore ridiculously high at > 5,000% (TODO: return per £1)
 
 ## Further enhancements and reliability
 

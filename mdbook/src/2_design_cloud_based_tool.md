@@ -4,7 +4,7 @@
 
 This involved short (30 minutes max) stakeholder interviews to gather key requirements. Once common threads had been identified AI was used to generate a set of possible mock-ups to ensure that potential users were clear on how the information could be presented back to them.
 
-These were then split into functional, non-functional and security requirements. Security received it's own category due to its growing importance in solution design given the incoming onslaught of AI driven attacks (REF: add one here)
+These were then split into functional, non-functional and security requirements. Security received it's own category due to its growing importance in solution design given the incoming onslaught of AI driven attacks (Hassan, 2025)
 
 ### Functional Requirements
 
@@ -39,7 +39,9 @@ While the URL _could_ exist publically there should be absolutely no access with
 
 An Azure Function App is a managed hosting container that runs one or more small, event-triggered code units called Functions. The App Service platform handles the underlying compute, OS patching, TLS termination, and scaling, so the team writes only application logic (Microsoft, 2026). Functions are billed either per-execution on a Consumption plan, or at a fixed rate on a dedicated App Service Plan where the runtime stays resident on reserved virtual machine instances.
 
-In this implementation a **Basic B1 App Service Plan** (dedicated compute, Linux, ~£10/month) hosts a single Python 3.11 Function App with `always_on = true`. The dedicated plan was chosen over the Consumption (Y1) plan because personal Azure subscriptions carry a zero-core VM quota that blocks Consumption plan deployments; the B1 plan uses a pre-allocated instance that is not subject to that quota. On a dedicated plan the Functions runtime would idle after a few minutes of inactivity without `always_on`, causing the first request after a quiet period to incur a cold-start delay that would violate the 2-second page-load non-functional requirement (Microsoft, 2025). Always On prevents this by keeping the worker process live.
+In this implementation a **Basic B1 App Service Plan** (dedicated compute, Linux, ~£10/month) hosts a single Python 3.11 Function App with `always_on = true`. The dedicated plan was chosen over the Consumption (Y1) plan because personal Azure subscriptions carry a zero-core VM quota that blocks Consumption plan deployments. The B1 plan uses a pre-allocated instance that is not subject to that quota.
+
+On a dedicated plan the Functions runtime would idle after a few minutes of inactivity without `always_on`, causing the first request after a quiet period to incur a cold-start delay that would violate the 2-second page-load non-functional requirement (Microsoft, 2025). Always On prevents this by keeping the worker process live.
 
 The design uses an event-driven Azure architecture so pipeline outcomes are captured in near real time and exposed through a secure, lightweight dashboard API.
 
@@ -68,6 +70,8 @@ flowchart LR
     U -->|Access Function App URL| API
 ```
 
+Figure 1: Solution process flow
+
 In this model, Azure DevOps emits pipeline outcomes to a queue, an ingestion function normalises and stores the records in a simple NoSQL store (Azure Table Storage), and a separate Function App serves the dashboard backend. Access to the Function App is restricted to members of a specific Entra ID security group, with MFA and UK-only conditional access policies enforced before requests are accepted. Application Insights captures authentication, request, and operational telemetry for audit and support.
 
 ### Alternative Storage and Platform Options
@@ -87,13 +91,13 @@ Additional platform substitutions:
 
 Quite a lot of these options are considerable overkill for what is effectivly a dashboard website over some api calls that update a table.
 
-Getting something in front of users as a starting point in order to receive product and user feedback is more valuable than over-engineering something that might be superceded by Microsoft or another vendor at some point.
+Getting something in front of users as a starting point in order to receive product and user feedback is more valuable than over-engineering something that might be superceded by Microsoft themselves releasing a new feature into Azure DevOps that addresses the defecit we're looking to fill with this tool.
 
 ### Networking Considerations
 
 The networking design must balance UK residency, secure access, and low-latency event flow.
 
-- UK data boundary: Place queue, functions, storage, and telemetry in UK regions to meet residency requirements.
+- UK data boundary: Place queue, functions, storage, and telemetry in UK regions to meet data location requirements.
 - Secure ingress: Enforce Entra sign-in, MFA, and UK-only Conditional Access before Function App access is granted.
   - Conditional Access rules could also be extended to device level if necessary
 - Private service paths: Azure Private Endpoints assign a private IP address inside a Virtual Network to a managed service such as Azure Storage or Key Vault. Traffic between the Function App and those services then travels over the Azure backbone rather than the public internet, eliminating a class of network-level attack surface (Microsoft, 2024).
@@ -105,13 +109,19 @@ The networking design must balance UK residency, secure access, and low-latency 
   - Add alarms for failed calls and health checking
 
 ![Resource map](images/resource_map.png)
-Figure 1: Azure Resource Map
+Figure 2: Azure Resource Map
 
 ## Changes during the build process
 
-1. User feedback to the initial HTML/wireframe was that there needed to be a filter view at the beginning of go  live, not as a feature to be added later
+As part of the development process reviews were carried out with stakeholders at the end of each sprint. Part of the Product Managment role within the development team was to handle queries and concerns raised by various stakeholders.
+
+1. User feedback to the initial HTML/wireframe was that there needed to be a filter view at the beginning of go live, not as a feature to be added later
 2. There were concerns about using NoSQL as opposed to a more structured and queriable database format but the suggestion to attach an MCP server to this afterwards removed this objection
 3. Concerns were raised about scalability but looking at the initial number of changes per day this was dismissed as irrelevant for at least the next 12 months
+
+The Product Manager was able to focus people back to the delivery of an initial MVP (Minimal Viable Product) on which iterations and improvements could be made later.
+
+Perfect is the Enemy of Good - Wikipedia, 2020 (TODO: fix formatting)
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===

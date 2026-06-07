@@ -10,6 +10,7 @@ Chrome for Developers. (n.d.). Simulate mobile devices with device mode | Chrome
 
 Github Staff. (2025). Octoverse: A new developer joins GitHub every second as AI leads TypeScript to #1. [online] The GitHub Blog. Available at: https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/ [Accessed 3 June 2025]
 ‌
+Hassan, K. (2025). AI Cyber Attack Statistics 2025, Trends, Costs, Defense. [online] DeepStrike. Available at: https://deepstrike.io/blog/ai-cyber-attack-statistics-2025. [Accessed 7 June 2026]
 
 ‌Hava, T. (2020). Cattle vs Pets - DevOps Explained. [online] Hava.io. Available at: https://www.hava.io/blog/cattle-vs-pets-devops-explained [Accessed 3 May 2026].
 
@@ -34,5 +35,7 @@ Microsoft (2026). Azure Functions Dedicated hosting. [online] Microsoft.com. Ava
 Taneja, H. (2019). The Era of ‘Move Fast and Break Things’ Is Over. [online] Harvard Business Review. Available at: https://hbr.org/2019/01/the-era-of-move-fast-and-break-things-is-over [Accessed 2 May 2026].
 
 Trivy. (n.d.). Trivy Home. [online] Available at: https://trivy.dev/. [Accessed 3 June 2026]
+
+Wikipedia. (2020). Perfect is the enemy of good. [online] Available at: https://en.wikipedia.org/wiki/Perfect_is_the_enemy_of_good. [Accessed 7 June 2026]
 
 Wikipedia. (2023). Meta Platforms. [online] Available at: https://en.wikipedia.org/wiki/Meta_Platforms#History [Accessed 10 May 2026].
