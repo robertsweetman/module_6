@@ -2,18 +2,18 @@
 
 ## ROI
 
-Ongoing cost is very low with the projected bill for May being only about 25 pence althought he app service machine this is running on costs about £10 per month total.
+Ongoing cost is very low: the projected variable bill for May was only about 25 pence, on top of the Basic B1 App Service Plan at ~£10/month, giving a total run cost of roughly £10.25/month.
 
 ![May 2026 costs](images/cost_may.png)
 Figure 7: Monthly subscription costs
 
 ROI in terms of time saved is therefore very high.
 
-Even if across the whole business we save a dozen people about half an hour per week each avoiding chasing for stats updates...
+Even if across the whole business we save a dozen people about half an hour per week each avoiding chasing for stats updates:
 
-12 (people) x 0.5 (half an hour) x 24 (hourly rate in GBP) x 4 (weeks per month) = £576 per month
+12 (people) × 0.5 (half an hour) × £24 (hourly rate in GBP) × 4 (weeks per month) = £576 per month
 
-The dashboard ROI is therefore > 5,660% (approximately £57 return per £1 spent)
+Against the £10.25/month run cost that is a return of roughly £56 per £1 spent (≈ 5,520%).
 
 ## Further enhancements and reliability
 
@@ -25,7 +25,7 @@ An example might be "Which service has had the most updates in the last 12 month
 
 This would be a significant enhancement which users could interact with via a text box in the site. Wiring this up to Azure's AI interface would be via Terraform (IaC) as with all the other resources.
 
-This would likely increase the cost upwards but given the useability improvements for stakeholders it would be worth upping the costs to £20 per month or more.
+This would likely increase the cost upwards but given the usability improvements for stakeholders it would be worth upping the costs to £20 per month or more.
 
 ### DORA metric comparison
 
@@ -62,11 +62,11 @@ Application insights monitoring, especially around user logins, complete the sec
 
 By making this information widely accessible across the organisation a high ROI is achieved by reducing status reporting meetings, cross team calls, faster triage of release based issues while running on low cost serverless and managed cloud resources.
 
-The client should roll this out in phases - one ADO project intially, check the pipeline and event schema works and then onboarding the others. This reduces risk and will highlight any integration issues before users are exposed to the application.
+The client should roll this out in phases — one ADO project initially, check the pipeline and event schema works and then onboard the others. This reduces risk and will highlight any integration issues before users are exposed to the application.
 
 As AI assisted coding increases deployment frequency the number and speed of pipeline events will grow. Organisations using AI already report a significant increase in commit frequency (GitHub Staff, 2025) so a dashboard like this becomes more critical.
 
-This cloud hosted dashboard addresses the 'where is that information?' problem associated with shipping work into production for actual users. Now there's one place to interogate whether a feature or new release has shipped that's available across the business.
+This cloud hosted dashboard addresses the 'where is that information?' problem associated with shipping work into production for actual users. Now there's one place to interrogate whether a feature or new release has shipped that's available across the business.
 
 <!--
 === REPORT STRUCTURE — What to cover in this section ===

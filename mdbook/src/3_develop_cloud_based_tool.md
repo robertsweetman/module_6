@@ -2,17 +2,15 @@
 
 ## Development Workflow
 
-We used Azure DevOps boards to capture all the tasks, split these into sprints, create milestones and report against them. Tags were used (functional, non-functional, security) to make sure all the requirements were covered off and grouped for review against the intial specification.
+We used Azure DevOps boards to capture all the tasks, split these into sprints, create milestones and report against them. Tags were used (functional, non-functional, security) to make sure all the requirements were covered off and grouped for review against the initial specification.
 
 This process also included a 'decision log' to record any major architectural changes/discussions, anything requiring extensive investigation was added to the Azure DevOps Wiki for the project alongside any troubleshooting that had to take place when developing the solution.
 
 The function app (serverless) route was chosen over containers as the additional networking overhead wasn't justified. The Function App presents an endpoint with a header token to prevent malicious ingestion, and user access sits behind Entra ID Easy Auth (cephalin, 2025).
 
-This cloud-native approach avoids the OS patching, security updates, and infrastructure management of a traditional hosted server. While Azure Functions limit direct portability to other cloud providers, local development is fully supported — Python and other runtimes can be built and tested without deploying to the cloud.
+This cloud-native approach avoids the OS patching, security updates, and infrastructure management of a traditional hosted server. Local development is fully supported — Python and other runtimes can be built and tested without deploying to the cloud.
 
-We're not really having to manage persistent state and there's only a single endpoint so a function app is the least complex approach while still retaining portability.
-
-The function code could still be easily moved to another cloud with only minor tweaks.
+We're not really having to manage persistent state and there's only a single endpoint, so a Function App is the least complex approach. The Azure Functions trigger bindings are platform-specific, so moving to AWS Lambda or GCP Cloud Functions would require replacing the trigger/binding layer, but the core Python business logic is portable with only minor tweaks.
 
 ```mermaid
 gantt
@@ -30,7 +28,7 @@ gantt
     Sprint 5 - Project roundup                      :a8, after a7, 14d
 ```
 
-Figure 2: Project Timeline
+Figure 3: Project Timeline
 
 Sprint 1 focusses on setting up deployment pipelines so that the project resources are created in Azure from the very beginning.
 
@@ -46,11 +44,11 @@ Whether Azure DevOps, GitHub Actions, JIRA, or a self-hosted Jenkins instance, t
 
 ### Publishing events
 
-Publishing from a pipeline run to an accessible but secure endpoint went through a numnber of iterations as to which Python library to use. We had to temporarily enable App Insights to debug why the app deploymnet wasn't working.
+Publishing from a pipeline run to an accessible but secure endpoint went through a number of iterations as to which Python library to use. We had to temporarily enable App Insights to debug why the app deployment wasn't working.
 
 ### Event Design
 
-We needed the actual event to be well designed and extensible. It is effectively like a database schema or excel table and is the core 'information unit' about a project and it's commit status which are defined in point 1 of the 'Functional Requirements'
+We needed the actual event to be well designed and extensible. It is effectively like a database schema or Excel table and is the core 'information unit' about a project and its commit status, which is defined in point 1 of the 'Functional Requirements'.
 
 ```python
     entity = {
@@ -104,7 +102,7 @@ Allows users to filter to the service they're interested in and click on links t
 
 As part of the solution deployment we can take advantage of Azure DevOps pipeline controls which give admins the ability to 'lock down' code changes and deployments so best practices are followed.
 
-- PR's require another code reviewer before merging into main
+- PRs require another code reviewer before merging into main
 - Running the application deployment pipeline for the azure function needs sign off by at least one other authorised team member
 - We can use static code analysis pipelines to measure code quality
   - Tflint looks at terraform code spacing and other formatting rules
@@ -113,11 +111,11 @@ As part of the solution deployment we can take advantage of Azure DevOps pipelin
 
 ### Azure Function and Function App debugging
 
-Azure functions are easily linked to Application Insights, can log out to these for checking as well as send malformed requests to a dead letter queue for investigation. Microsoft strongly promote serverless functions so there is extensive documentation about debugging and monitoring these (Jarret Renshaw, 2026)
+Azure functions are easily linked to Application Insights, can log out to these for checking as well as send malformed requests to a dead letter queue for investigation. Microsoft strongly promote serverless functions so there is extensive documentation about debugging and monitoring these (Renshaw, 2026).
 
 ## Testing Methodology
 
-In order to meet the non-functional requirements (speed, security) etc. a tester was assigned to the project. So this work was also visible to others on the project they used Azure DevOps test plans to raise bugs, record test runs and document their fundings - especially linking back to non-functional requirements like performance & useability.
+In order to meet the non-functional requirements (speed, security) etc. a tester was assigned to the project. So this work was also visible to others on the project, they used Azure DevOps test plans to raise bugs, record test runs and document their findings — especially linking back to non-functional requirements like performance and usability.
 
 ### Testing Scalability & UI Performance
 
@@ -134,7 +132,7 @@ Serverless functions scale on demand; per-function scaling is a platform respons
 
 ### API Testing
 
-We can use a testing framework to inject junk calls to the API endoint or incorrectly structured data to make sure it's not accepted or partially complete. If needed we 'could' use the same automated approach to send a large number of API requests at the same time to make sure that the application copes with an unusually high load.
+We can use a testing framework to inject junk calls to the API endpoint or incorrectly structured data to make sure it's not accepted or partially complete. If needed we 'could' use the same automated approach to send a large number of API requests at the same time to make sure that the application copes with an unusually high load.
 
 ## Resilience and recovery from failure
 

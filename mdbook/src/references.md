@@ -8,19 +8,21 @@ cephalin (2025). Configure Microsoft Entra Authentication - Azure App Service. [
 
 Chrome for Developers. (n.d.). Simulate mobile devices with device mode | Chrome DevTools. [online] Available at: https://developer.chrome.com/docs/devtools/device-mode. [Accessed 3 June 2026]
 
-Github Staff. (2025). Octoverse: A new developer joins GitHub every second as AI leads TypeScript to #1. [online] The GitHub Blog. Available at: https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/ [Accessed 3 June 2025]
+Dora.dev (2021). DORA's research program. [online] Available at: https://dora.dev/research/ [Accessed 7 June 2026].
+
+GitHub Staff. (2025). Octoverse: A new developer joins GitHub every second as AI leads TypeScript to #1. [online] The GitHub Blog. Available at: https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/ [Accessed 3 June 2026].
 ‌
 Hassan, K. (2025). AI Cyber Attack Statistics 2025, Trends, Costs, Defense. [online] DeepStrike. Available at: https://deepstrike.io/blog/ai-cyber-attack-statistics-2025. [Accessed 7 June 2026]
 
 ‌Hava, T. (2020). Cattle vs Pets - DevOps Explained. [online] Hava.io. Available at: https://www.hava.io/blog/cattle-vs-pets-devops-explained [Accessed 3 May 2026].
 
-JarrettRenshaw (2026). Application Insights logs are missing or incorrect - Azure. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/troubleshoot/azure/azure-functions/monitoring/functions-monitoring-appinsightslogs [Accessed 3 Jun. 2026].
+Renshaw, J. (2026). Application Insights logs are missing or incorrect - Azure. [online] Microsoft.com. Available at: https://learn.microsoft.com/en-us/troubleshoot/azure/azure-functions/monitoring/functions-monitoring-appinsightslogs [Accessed 3 June 2026].
 
 JetBrains (2026). What are the Benefits of CI/CD? | TeamCity CI/CD Guide. [online] JetBrains. Available at: https://www.jetbrains.com/teamcity/ci-cd-guide/benefits-of-ci-cd/. [Accessed 21 May 2026]
 
 ‌John (2026). What Users Expect From Online Platforms in 2026. [online] TechJihad. Available at: https://techjihad.com/what-users-expect-from-online-platforms-in-2026/ [Accessed 10 May 2026].
 
-Le, S. (2025). Breaking Down Silos in Software Development with DevOps - CodeStringers. [online] CodeStringers. Available at: https://www.codestringers.com/insights/silos-in-software-development/ [Accessed 31 May, 2026]
+Le, S. (2025). Breaking Down Silos in Software Development with DevOps - CodeStringers. [online] CodeStringers. Available at: https://www.codestringers.com/insights/silos-in-software-development/ [Accessed 31 May 2026].
 ‌
 LEAD INNOVATIONZ (2025). Introduction Cloud computing has redefined the way businesses develop, deploy, and manage software. No longer constrained by physical infrastructure, organizations now leverage the cloud to drive innovation, boost efficiency, and scale at unprecedented speed. [online] Linkedin.com. Available at: https://www.linkedin.com/pulse/how-cloud-computing-transforming-modern-software-engineering-5vjyc [Accessed 3 May 2026].
 

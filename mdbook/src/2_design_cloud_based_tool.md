@@ -4,7 +4,7 @@
 
 Short (30 minutes max) stakeholder interviews gathered key requirements. Once common threads emerged, AI generated mock-ups so users could see how the information might be presented back to them.
 
-These were then split into functional, non-functional and security requirements. Security received it's own category due to its growing importance in solution design given the incoming onslaught of AI driven attacks (Hassan, 2025)
+These were then split into functional, non-functional and security requirements. Security received its own category due to its growing importance in solution design given the incoming onslaught of AI driven attacks (Hassan, 2025).
 
 ### Functional Requirements
 
@@ -33,7 +33,7 @@ Non-functional requirements define how well the tool must perform in terms of qu
 
 Non-staff members should have absolutely no access to the dashboard at all. It should only be accessible to members of a particular security group via 2 Factor Authentication (2FA) and enrolment into the group should be managed via the security team following the creation of a support ticket with line manager approval.
 
-While the URL _could_ exist publically there should be absolutely no access without having to sign on first. Sign ons should also be logged and monitored as well as restricted to UK logins only.
+While the URL _could_ exist publicly there should be absolutely no access without having to sign on first. Sign ons should also be logged and monitored as well as restricted to UK logins only.
 
 ## Solution Design
 
@@ -47,24 +47,26 @@ The design uses an event-driven Azure architecture so pipeline outcomes are capt
 
 ```mermaid
 flowchart LR
-    subgraph UK[UK Region Boundary]
+    subgraph UK[UK Data Residency Boundary]
         ADO[Azure DevOps Pipeline]
         Q[Azure Queue Storage<br/>Pipeline Result Events]
         ING[Azure Function<br/>Event Ingestion]
         DB[(Azure Table Storage<br/>NoSQL)]
         API[Azure Function App<br/>Backend API]
         AI[Application Insights<br/>Access and Telemetry Logs]
-        CA[Entra ID Conditional Access<br/>UK geo-restriction + MFA]
-        SG[Entra ID Security Group<br/>Authorised Staff Only]
 
         ADO -->|Post result events| Q
         Q -->|Queue trigger| ING
         ING -->|Upsert release status| DB
         API -->|Read dashboard data| DB
         API -->|Send logs and metrics| AI
-        CA -->|Policy enforcement| API
-        SG -->|Group-based authorisation| API
     end
+
+    CA[Entra ID Conditional Access<br/>UK geo-restriction + MFA]
+    SG[Entra ID Security Group<br/>Authorised Staff Only]
+
+    CA -->|Policy enforcement| API
+    SG -->|Group-based authorisation| API
 
     U[Internal User] -->|Sign in via Entra ID| CA
     U -->|Access Function App URL| API
@@ -97,12 +99,14 @@ The networking design must balance UK residency, secure access, and low-latency 
 - Private service paths: Azure Private Endpoints assign a private IP address inside a Virtual Network to a managed service such as Azure Storage or Key Vault. Traffic between the Function App and those services then travels over the Azure backbone rather than the public internet, eliminating a class of network-level attack surface (Microsoft, 2024).
 - VNet Integration allows the Function App's outbound calls to originate from a delegated subnet, which in turn enables network security group rules and private DNS zones to govern all egress. In this design the Function App, Storage Account, and Key Vault are candidates for private endpoint attachment once a supporting VNet is provisioned.
 - Controlled egress: Restrict outbound calls to approved Azure DevOps and Azure platform endpoints.
-  - This site is 'read only' so in fact no outbound calls should be possible other than back to make filter view requests.
+  - This site is 'read only' from the user's perspective, so the Function App's only outbound calls are to Table Storage, Key Vault and Application Insights; no general internet egress is required.
 - Performance and resilience: Keep ingestion and storage co-located and use retry/dead-letter plus geo-redundant storage where recovery objectives require it.
 - Network observability: Track dependency latency, throttling, and failed calls in Application Insights; add alarms and health checks.
 
 ![Resource map](images/resource_map.png)
 Figure 2: Azure Resource Map shows:
+
+<!-- Figure numbering convention: Fig 1 (mermaid arch), Fig 2 (resource map) in §2; Fig 3 (Gantt), Fig 4 (schema), Fig 5/6 (app screenshots) in §3; Fig 7 (costs) in §4. -->
 
 - Managed identity for deploying resources into Azure via Terraform
 - Storage Account for Table storage
@@ -117,7 +121,7 @@ These are only accessed at runtime by the function app's managed identity as sec
 
 ### dashboard-ingest-api-key
 
-A randomly generated token that all ADO pipelines must include in their request header. This tells the function app ingesiton endpoint that the write request is legitimate.
+A randomly generated token that all ADO pipelines must include in their request header. This tells the function app ingestion endpoint that the write request is legitimate.
 
 ### dashboard-api-client-secret
 
@@ -131,7 +135,7 @@ Sprint reviews with stakeholders allowed the Product Manager to handle queries a
 2. There were concerns about using NoSQL as opposed to a more structured and queriable database format but the suggestion to attach an MCP server to this afterwards removed this objection
 3. Concerns were raised about scalability but looking at the initial number of changes per day this was dismissed as irrelevant for at least the next 12 months
 
-The Product Manager refocused the team on delivering an initial MVP (Minimal Viable Product) for later iteration rather than a polished final product.
+The Product Manager refocused the team on delivering an initial MVP (Minimum Viable Product) for later iteration rather than a polished final product.
 
 "Perfect is the Enemy of Good" (Wikipedia, 2020)
 

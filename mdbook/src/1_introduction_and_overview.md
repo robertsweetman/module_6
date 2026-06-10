@@ -10,7 +10,7 @@ Containerisation and Serverless are the epitome of this approach where applicati
 
 The move from multi-week on-prem deployments to a service model can be summed up in the phrase "cattle, not pets" as described by the DevOps movement (Hava, 2020). Resources become ephemeral, scalable and ultimately disposable.
 
-Infrastructure automation tools like Terraform, Bicep (Azure), Cloudfront (AWS) enable the flexibility to stand services up, turn them off and then rebuild them at the touch of a button.
+Infrastructure automation tools like Terraform, Bicep (Azure) and CloudFormation (AWS) enable the flexibility to stand services up, turn them off and then rebuild them at the touch of a button.
 
 ## From "Move Fast and Break Things" to Stability
 
@@ -18,7 +18,7 @@ Mark Zuckerberg announced in 2014 that Meta's internal motto would change from "
 
 Empowering dozens of engineering teams to make daily changes across different applications and repositories requires automation to build test environments, deployment pipelines and being able to see infrastructure changes over time.
 
-Having an at-a-glance way to see what's been deployed when and where allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up the process of modern software development.
+Having an at-a-glance way to see what's been deployed, when and where, allows software delivery managers, team leads and business leaders to surface the rolling changes that now make up the process of modern software development.
 
 Leveraging CI/CD confers a dozen distinct advantages over organisations that don't use this development pattern (JetBrains, 2026).
 
@@ -38,13 +38,13 @@ Each stakeholder group has their own particular view and context.
 
 - What application versions are deployed?
 - Are all environments (dev/test/production) on the same release?
-- Where a new version is in the pre-deployment test cycle
+- Where is a new version in the pre-deployment test cycle?
 
 ### Project & Release Managers
 
 - What versions are likely to be coming next?
 - Are there items that need resolving or are holding up progress?
-- Is there any sort of release pipeline holdup
+- Is there any sort of release pipeline holdup?
 
 ### Support
 
@@ -54,15 +54,15 @@ Each stakeholder group has their own particular view and context.
 ### Business Owners
 
 - Is version 'x' with feature 'y' released yet?
-- How many sprints left till a particular feature is released?
-- Where in the feature delivery pipeline is a particula application?
+- How many sprints left until a particular feature is released?
+- Where in the feature delivery pipeline is a particular application?
   - Development/Testing/Live
 
 While Azure DevOps provides an individual 'per-project' view there's no single place where this sort of information can be surfaced across an organisation (Le, 2025)
 
 ## Solution Overview
 
-Building a cloud-based delivery status website provides a single, organisation-wide view of developers work, connecting code changes to the delivery of business outcomes across environments.
+Building a cloud-based delivery status website provides a single, organisation-wide view of developers' work, connecting code changes to the delivery of business outcomes across environments.
 
 It aligns with the software development lifecycle by surfacing the build, test and release cycles to a wider set of stakeholders.
 
@@ -70,7 +70,7 @@ It aligns with the software development lifecycle by surfacing the build, test a
 
 Choosing to use serverless and api endpoints does away with traditional gateway, switch, user defined route, port access rules and firewalls.
 
-We're sending Azure DevOps triggers across the the public internet through Azure's global DNS and TLS termination, then through Entra ID Conditional Access, before reaching the Function App.
+We're sending Azure DevOps triggers across the public internet through Azure's global DNS and TLS termination, then through Entra ID Conditional Access, before reaching the Function App.
 
 For a read-heavy dashboard, **latency** is the dominant quality-of-service concern over throughput because the user base are looking for a short page load.
 
